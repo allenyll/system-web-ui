@@ -1,54 +1,40 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" style="width: 200px;" class="filter-item" placeholder="姓名" @keyup.enter.native="handleFilter"/>
-      <el-input v-model="listQuery.account" style="width: 200px;" class="filter-item" placeholder="账户" @keyup.enter.native="handleFilter"/>
-      <el-input v-model="listQuery.phone" style="width: 200px;" class="filter-item" placeholder="手机号" @keyup.enter.native="handleFilter"/>
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
-      <el-button v-if="userManager_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
+      <el-input v-model="listQuery.name" style="width: 200px;" class="filter-item" placeholder="名称" @keyup.enter.native="handleFilter"/>
+      <el-button class="filter-item" type="primary" icon="search" @click="handleFilter">搜索</el-button>
+      <el-button v-if="depotManager_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="edit" @click="handleCreate">添加</el-button>
     </div>
     <el-table v-loading.body="listLoading" :key="tableKey" :data="list" border fit highlight-current-row style="width: 100%">
       <el-table-column v-if="show" align="center" label="ID" width="0">
         <template scope="scope">
-          <span>{{ scope.row.pkUserId }}</span>
+          <span>{{ scope.row.pkDepotId }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="姓名">
-        <template scope="scope">
-          <span>{{ scope.row.userName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="110" align="center" label="账户">
-        <template scope="scope">
-          <span>{{ scope.row.account }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="110" align="center" label="部门">
+      <el-table-column width="200" align="center" label="名称">
         <template scope="scope">
           <span>{{ scope.row.depotName }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="状态">
+      <el-table-column width="110" align="center" label="编码">
         <template scope="scope">
-          <span>{{ scope.row.realStatus }}</span>
+          <span>{{ scope.row.depotCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="性别">
+      <el-table-column width="110" align="center" label="上级部门">
         <template scope="scope">
-          <span>{{ scope.row.realSex }}</span>
+          <span>{{ scope.row.parentDepotName }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="150" align="center" label="手机号">
+      <el-table-column width="180" align="center" label="最后时间">
         <template scope="scope">
-          <span>{{ scope.row.phone }}</span>
+          <span>{{ scope.row.updateTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="300"> <template scope="scope">
-        <el-button v-if="userManager_btn_edit" size="small" type="success" icon="el-icon-edit" @click="handleUpdate(scope.row)">编辑
+      <el-table-column align="center" label="操作" width="234"> <template scope="scope">
+        <el-button v-if="depotManager_btn_edit" size="small" type="success" @click="handleUpdate(scope.row)">编辑
         </el-button>
-        <el-button v-if="userManager_btn_del" size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除
-        </el-button>
-        <el-button v-if="userManager_btn_config_role" size="small" type="info" icon="el-icon-rank" @click="handleConfig(scope.row)">配置权限
+        <el-button v-if="depotManager_btn_del" size="small" type="danger" @click="handleDelete(scope.row)">删除
         </el-button>
       </template> </el-table-column>
     </el-table>
@@ -57,37 +43,21 @@
     </div>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="姓名" prop="userName">
-          <el-input v-model="form.userName" placeholder="请输入姓名"/>
+        <el-form-item label="名称" prop="depotName">
+          <el-input v-model="form.depotName" placeholder="请输入部门名称"/>
         </el-form-item>
-        <el-form-item label="账户" prop="account">
-          <el-input v-if="dialogStatus == 'create'" v-model="form.account" placeholder="请输入账户"/>
-          <el-input v-else v-model="form.account" placeholder="请输入账户" readonly/>
+        <el-form-item label="编码" prop="depotCode">
+          <el-input v-model="form.depotCode" placeholder="请输入编码"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus == 'create'" label="密码" placeholder="请输入密码" prop="password">
-          <el-input v-model="form.password" type="password"/>
-        </el-form-item>
-        <el-form-item label="部门" placeholder="请选择部门" prop="depotName">
-          <el-input v-model="form.depotName" style="width:80%; float:left;"/>
+        <el-form-item label="上级部门" placeholder="请选择部门" prop="parentDepotName">
+          <el-input v-model="form.parentDepotName" style="width:80%; float:left;"/>
           <el-button style="margin-left:10px;" type="primary" icon="el-icon-menu" @click="dialogDepotVisible = true">组织树</el-button>
         </el-form-item>
-        <el-form-item v-if="showDeoptId" label="部门" placeholder="请选择部门" prop="fkDepotId">
-          <el-input v-model="form.fkDepotId"/>
+        <el-form-item v-if="showDeoptId" label="部门" placeholder="请选择部门" prop="parentDepotId">
+          <el-input v-model="form.parentDepotId"/>
         </el-form-item>
-        <el-form-item label="状态" placeholder="请选择状态" prop="status">
-          <el-radio v-model="form.status" label="SW0001">启用</el-radio>
-          <el-radio v-model="form.status" label="SW0002">冻结</el-radio>
-        </el-form-item>
-        <el-form-item label="性别">
-          <el-select v-model="form.sex" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in sexOptions" :key="item.value" :label="item.name" :value="item.value"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入手机号"/>
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="请输入邮箱"/>
+        <el-form-item label="排序" prop="sort">
+          <el-input v-model="form.sort" placeholder="请输入序号"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -108,42 +78,26 @@
         <el-button type="primary" @click="configDepot">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="dialogRoleVisible" title="配置权限" >
-      <el-transfer
-        :filter-method="filterMethod"
-        v-model="role"
-        :data="roleList"
-        filterable
-        filter-placeholder="请输入角色名称"/>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancleRole">取 消</el-button>
-        <el-button type="primary" @click="configRole">确 定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { page, addObj, getObj, delObj, putObj, getDepotObj, getRoleList, setRoles } from '@/api/admin/user/index'
+import { page, addObj, getObj, delObj, putObj } from '@/api/admin/depot/index'
 import { getDepotTree } from '@/api/admin/depot/index'
 import { mapGetters } from 'vuex'
 export default {
-  name: 'User',
+  name: 'Depot',
   data() {
     return {
       form: {
-        userName: undefined,
-        account: undefined,
-        fkDepotId: undefined,
-        sex: '男',
-        password: undefined,
-        phone: undefined,
-        email: undefined,
         depotName: undefined,
-        status: 'SW0001'
+        depotCode: undefined,
+        parentDepotName: undefined,
+        parentDepotId: undefined,
+        sort: undefined
       },
       rules: {
-        userName: [
+        depotName: [
           {
             required: true,
             message: '请输入用户',
@@ -198,39 +152,18 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        name: '',
-        status: '',
-        account: '',
-        phone: ''
+        name: ''
       },
-      sexOptions: [
-        {
-          'name': '男',
-          'value': 'SW0201'
-        },
-        {
-          'name': '女',
-          'value': 'SW0200'
-        }
-      ],
       dialogFormVisible: false,
       dialogStatus: '',
-      userManager_btn_edit: false,
-      userManager_btn_del: false,
-      userManager_btn_add: false,
-      userManager_btn_config_role: false,
+      depotManager_btn_edit: false,
+      depotManager_btn_del: false,
+      depotManager_btn_add: false,
       textMap: {
         update: '编辑',
         create: '创建'
       },
-      tableKey: 0,
-      dialogRoleVisible: false,
-      roleList: [],
-      role: [],
-      configUserId: '',
-      filterMethod(query, item) {
-        return item.label.indexOf(query) > -1
-      }
+      tableKey: 0
     }
   },
   watch: {
@@ -241,10 +174,9 @@ export default {
   created() {
     this.getList()
     this.getDepotTreeList()
-    this.userManager_btn_edit = this.elements['sys:user:edit']
-    this.userManager_btn_del = this.elements['sys:user:delete']
-    this.userManager_btn_add = this.elements['sys:user:add']
-    this.userManager_btn_config_role = this.elements['sys:user:configRole']
+    this.depotManager_btn_edit = this.elements['sys:depot:edit']
+    this.depotManager_btn_del = this.elements['sys:depot:delete']
+    this.depotManager_btn_add = this.elements['sys:depot:add']
   },
   computed: {
     ...mapGetters([
@@ -256,7 +188,7 @@ export default {
       this.listLoading = true
       page(this.listQuery)
         .then(response => {
-          this.list = response.data.userList
+          this.list = response.data.depotList
           this.total = response.data.total
           this.listLoading = false
         })
@@ -295,70 +227,11 @@ export default {
         return
       }
       this.form.fkDepotId = keyArr[0]
-      getDepotObj(keyArr[0]).then(response => {
+      getObj(keyArr[0]).then(response => {
+        console.log(response)
         this.form.depotName = response.data.sysDepot.depotName
       })
       this.dialogDepotVisible = false
-    },
-    cancleRole() {
-      this.dialogRoleVisible = false
-    },
-    configRole() {
-      console.log(this.role)
-      if (this.role.length < 1) {
-        this.$notify({
-          title: '错误',
-          message: '请选择一条数据',
-          type: 'error',
-          duration: 2000
-        })
-        return
-      }
-      if (this.role.length > 1) {
-        this.$notify({
-          title: '错误',
-          message: '一个用户只能拥有一个角色',
-          type: 'error',
-          duration: 2000
-        })
-        return
-      }
-      setRoles(this.configUserId, this.role).then(response => {
-        this.$notify({
-          title: '成功',
-          message: '配置成功',
-          type: 'success',
-          duration: 2000
-        })
-      })
-      this.dialogRoleVisible = false
-    },
-    handleConfig(row) {
-      this.role = []
-      this.dialogRoleVisible = true
-      this.configUserId = row.pkUserId
-      getRoleList(row.pkUserId).then(response => {
-        const roles = response.data.roleList
-        const data = []
-        if (roles != undefined && roles.length > 0) {
-          for (var i = 0; i < roles.length; i++) {
-            data.push({
-              label: roles[i].roleName,
-              key: roles[i].pkRoleId
-            })
-          }
-        }
-        this.roleList = data
-        const userRole = response.data.userRole
-        if (userRole != '') {
-          this.role.push(
-            userRole.pkRoleId
-          )
-        }
-      })
-    },
-    getRole() {
-
     },
     handleFilter() {
       this.getList()
@@ -377,9 +250,9 @@ export default {
       this.dialogFormVisible = true
     },
     handleUpdate(row) {
-      getObj(row.pkUserId)
+      getObj(row.pkDepotId)
         .then(response => {
-          this.form = response.data.sysUser
+          this.form = response.data.sysDepot
           this.dialogFormVisible = true
           this.dialogStatus = 'update'
         })
@@ -391,7 +264,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          delObj(row.pkUserId)
+          delObj(row.pkDepotId)
             .then(() => {
               this.$notify({
                 title: '成功',
@@ -400,6 +273,8 @@ export default {
                 duration: 2000
               })
               this.getList()
+              // const index = this.list.indexOf(row);
+              // this.list.splice(index, 1);
             })
         })
     },
@@ -433,12 +308,12 @@ export default {
         if (valid) {
           this.dialogFormVisible = false
           this.form.password = undefined
-          putObj(this.form.pkUserId, this.form).then(() => {
+          putObj(this.form.pkDepotId, this.form).then(() => {
             this.dialogFormVisible = false
             this.getList()
             this.$notify({
               title: '成功',
-              message: '更新成功',
+              message: '创建成功',
               type: 'success',
               duration: 2000
             })
@@ -450,15 +325,11 @@ export default {
     },
     resetTemp() {
       this.form = {
-        userName: undefined,
-        account: undefined,
-        fkDepotId: undefined,
-        sex: '男',
-        password: undefined,
-        phone: undefined,
-        email: undefined,
         depotName: undefined,
-        status: 'SW0001'
+        depotCode: undefined,
+        parentDepotName: undefined,
+        parentDepotId: undefined,
+        sort: undefined
       }
     }
   }
