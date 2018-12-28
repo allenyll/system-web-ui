@@ -41,7 +41,7 @@ export const constantRouterMap = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: 'dashboard',
     children: [
       {
         path: 'dashboard',
@@ -61,24 +61,53 @@ export default new Router({
 
 export const asyncRouterMap = [
   {
-    path: '/baseManager',
+    path: '/sys',
     component: Layout,
     name: '系统管理',
-    meta: { title: '系统管理', icon: 'system' },
+    meta: { title: '系统管理', icon: 'system', perms: 'sys:sys' },
     icon: 'setting',
-    // authority: 'baseManager',
     children: [{
-      path: 'userManager',
+      path: 'user',
       component: () => import('@/views/admin/user/index'),
       name: '用户管理',
-      meta: { title: '用户管理', icon: 'user', noCache: true }
-      // authority: 'userManager'
+      meta: { title: '用户管理', icon: 'user', perms: 'sys:user:user', noCache: true }
     }, {
-      path: 'menuManager',
+      path: 'menu',
       component: () => import('@/views/admin/menu/index'),
       name: '菜单管理',
-      meta: { title: '菜单管理', icon: 'menu', noCache: true }
-      // authority: 'menuManager'
+      meta: { title: '菜单管理', icon: 'menu', perms: 'sys:menu:menu', noCache: true }
+    }, {
+      path: 'depot',
+      component: () => import('@/views/admin/depot/index'),
+      name: '组织管理',
+      meta: { title: '组织管理', icon: 'tree', perms: 'sys:depot:depot', noCache: true }
+    }, {
+      path: 'role',
+      component: () => import('@/views/admin/role/index'),
+      name: '角色管理',
+      meta: { title: '角色管理', icon: 'role', perms: 'sys:role:role', noCache: true }
     }]
+  },
+  {
+    path: '/monitor',
+    component: Layout,
+    name: '系统工具',
+    meta: { title: '系统工具', icon: 'system', perms: 'monitor:monitor' },
+    icon: 'setting',
+    children: [
+      {
+        path: 'log',
+        component: () => import('@/views/monitor/log/index'),
+        name: '系统日志',
+        meta: { title: '系统日志', icon: 'log', perms: 'sys:log:log', noCache: true }
+      },
+      {
+        path: 'swagger',
+        // redirect: 'https://localhost:8082/swagger-ui.html',
+        component: () => import('@/views/monitor/swagger/index'),
+        name: 'swagger',
+        meta: { title: 'swagger', icon: 'log', perms: 'monitor:swagger:swagger', noCache: true }
+      }
+    ]
   }
 ]

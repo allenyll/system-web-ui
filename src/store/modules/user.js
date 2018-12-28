@@ -11,6 +11,8 @@ const user = {
     avatar: '',
     introduction: '',
     roles: [],
+    menus: undefined,
+    elements: undefined,
     setting: {
       articlePlatform: []
     }
@@ -40,6 +42,12 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_MENUS: (state, menus) => {
+      state.menus = menus
+    },
+    SET_ELEMENTS: (state, elements) => {
+      state.elements = elements
     }
   },
 
@@ -50,8 +58,10 @@ const user = {
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
           const data = response.data
-          commit('SET_TOKEN', data.token)
-          setToken(response.data.token)
+          var token = 'Bearer ' + data.token
+          const tokens = token
+          commit('SET_TOKEN', tokens)
+          setToken(tokens)
           resolve()
         }).catch(error => {
           reject(error)
@@ -68,15 +78,24 @@ const user = {
           }
           const data = response.data
 
-          if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-            commit('SET_ROLES', data.roles)
+          if (data.menus && data.menus.length > 0) { // 验证返回的roles是否是一个非空数组
+            console.log(data.menus)
+            commit('SET_MENUS', data.menus)
+            const elements = {}
+            for (let i = 0; i < data.menus.length; i++) {
+              const menuType = data.menus[i].menu_type
+              if (menuType === 'SW0100') {
+                elements[data.menus[i].menu_perms] = true
+              }
+            }
+            commit('SET_ELEMENTS', elements)
           } else {
-            reject('getInfo: roles must be a non-null array !')
+            reject('getInfo: menus must be a non-null array !')
           }
 
           commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
-          commit('SET_INTRODUCTION', data.introduction)
+          commit('SET_AVATAR', 'https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK7rhABLVGfWZ2OKtz9qP4WUMozicTT4DTKgDmIS9X4EXbdLMCS9PoXzibTeaHEgzcCrKgHWKibZlL0Q/132')
+          // commit('SET_INTRODUCTION', data.introduction)
           resolve(response)
         }).catch(error => {
           reject(error)

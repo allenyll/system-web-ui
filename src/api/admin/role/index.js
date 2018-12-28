@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function page(query) {
   return request({
-    url: '/user/page',
+    url: '/role/page',
     method: 'get',
     params: query
   })
@@ -10,7 +10,7 @@ export function page(query) {
 
 export function addObj(obj) {
   return request({
-    url: '/user/addUser',
+    url: '/role/addRole',
     method: 'post',
     data: obj
   })
@@ -18,43 +18,29 @@ export function addObj(obj) {
 
 export function getObj(id) {
   return request({
-    url: '/user/' + id,
-    method: 'get'
-  })
-}
-
-export function getDepotObj(id) {
-  return request({
-    url: '/depot/' + id,
+    url: '/role/' + id,
     method: 'get'
   })
 }
 
 export function delObj(id) {
   return request({
-    url: '/user/' + id,
+    url: '/role/' + id,
     method: 'delete'
   })
 }
 
 export function putObj(id, obj) {
   return request({
-    url: '/user/' + id,
+    url: '/role/' + id,
     method: 'put',
     data: obj
   })
 }
 
-export function getRoleList(id) {
+export function setMenus(id, obj) {
   return request({
-    url: '/role/getRoleList/' + id,
-    method: 'get'
-  })
-}
-
-export function setRoles(id, obj) {
-  return request({
-    url: '/user/setRoles',
+    url: '/role/setMenus',
     method: 'post',
     data: {
       'ids': obj,
@@ -63,3 +49,9 @@ export function setRoles(id, obj) {
   })
 }
 
+export function getRoleMenus(id) {
+  return request({
+    url: '/role/getRoleMenus/' + id,
+    method: 'get'
+  })
+}

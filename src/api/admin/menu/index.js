@@ -1,44 +1,51 @@
-import fetch from '@/utils/fetch'
+import request from '@/utils/request'
 
-export function fetchTree(query) {
-  return fetch({
-    url: '/api/admin/menu/tree',
+export function requestTree(query) {
+  return request({
+    url: '/menu/getAllMenu',
     method: 'get',
     params: query
   })
 }
 
-export function fetchAll() {
-  return fetch({
-    url: '/api/admin/menu/all',
+export function getMenuTree(type) {
+  return request({
+    url: '/menu/getMenuTree?type=' + type,
+    method: 'get'
+  })
+}
+
+export function requestAll() {
+  return request({
+    url: '/menu/all',
     method: 'get'
   })
 }
 export function addObj(obj) {
-  return fetch({
-    url: '/api/admin/menu',
+  return request({
+    url: '/menu/addMenu',
     method: 'post',
     data: obj
   })
 }
 
 export function getObj(id) {
-  return fetch({
-    url: '/api/admin/menu/' + id,
+  return request({
+    url: '/menu/' + id,
     method: 'get'
   })
 }
 
-export function delObj(id) {
-  return fetch({
-    url: '/api/admin/menu/' + id,
+export function delObj(id, obj) {
+  return request({
+    url: '/menu/' + id,
     method: 'delete'
   })
 }
 
 export function putObj(id, obj) {
-  return fetch({
-    url: '/api/admin/menu/' + id,
+  return request({
+    url: '/menu/' + id,
     method: 'put',
     data: obj
   })
