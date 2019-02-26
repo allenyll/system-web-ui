@@ -1,8 +1,10 @@
 import request from '@/utils/request'
 
+const path = '/system-web/user/'
+
 export function page(query) {
   return request({
-    url: '/user/page',
+    url: path + 'page',
     method: 'get',
     params: query
   })
@@ -10,7 +12,7 @@ export function page(query) {
 
 export function addObj(obj) {
   return request({
-    url: '/user/addUser',
+    url: path + 'add',
     method: 'post',
     data: obj
   })
@@ -18,28 +20,31 @@ export function addObj(obj) {
 
 export function getObj(id) {
   return request({
-    url: '/user/' + id,
+    url: path + id,
     method: 'get'
   })
 }
 
 export function getDepotObj(id) {
   return request({
-    url: '/depot/' + id,
+    url: '/system-web/depot/' + id,
     method: 'get'
   })
 }
 
 export function delObj(id) {
   return request({
-    url: '/user/' + id,
-    method: 'delete'
+    url: path + id,
+    method: 'delete',
+    params: {
+      eq_pk_user_id: id
+    }
   })
 }
 
 export function putObj(id, obj) {
   return request({
-    url: '/user/' + id,
+    url: path + id,
     method: 'put',
     data: obj
   })
@@ -47,14 +52,14 @@ export function putObj(id, obj) {
 
 export function getRoleList(id) {
   return request({
-    url: '/role/getRoleList/' + id,
+    url: '/system-web/role/getRoleList/' + id,
     method: 'get'
   })
 }
 
 export function setRoles(id, obj) {
   return request({
-    url: '/user/setRoles',
+    url: path + 'setRoles',
     method: 'post',
     data: {
       'ids': obj,

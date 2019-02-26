@@ -9,19 +9,18 @@
     </div>
 
     <el-row>
-      <el-col :span="8" style="margin-top:15px;">
+      <el-col :span="7" style="margin-top:15px;">
         <el-input v-model="filterText" placeholder="输入关键字进行过滤"/>
-        <el-tree
-          ref="menuTree"
-          :data="treeData"
-          :props="defaultProps"
-          :filter-node-method="filterNode"
-          class="filter-tree"
-          node-key="id"
-          highlight-current
-          @node-click="getNodeData"/>
+        <el-tree ref="menuTree" :data="treeData"  :props="defaultProps" :filter-node-method="filterNode"
+          class="filter-tree" node-key="id" highlight-current  @node-click="getNodeData">
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span>
+                <i><svg-icon :icon-class="node.icon"></svg-icon></i>&nbsp;{{ node.label }}
+            </span>              
+          </span>
+        </el-tree>
       </el-col>
-      <el-col :span="16" style="margin-top:15px;">
+      <el-col :span="16" style="margin-top:15px;margin-left:15px;">
         <el-card class="box-card">
           <el-form ref="form" :label-position="labelPosition" :model="form" :rules="menuRoles" label-width="80px">
             <el-form-item label="菜单id" prop="pkMenuId" hidden="true">
@@ -80,17 +79,14 @@
       <el-row style="margin:0 auto;">
         <el-col :span="15" style="margin-left:30px;">
           <el-input v-model="filterMenuText" placeholder="输入关键字过滤" style="margin-bottom:15px;"/>
-          <el-tree
-            ref="menuTreeDialog"
-            :data="menuTreeData"
-            :props="defaultProps"
-            :filter-node-method="filterNode"
-            class="filter-tree"
-            node-key="id"
-            highlight-current
-            show-checkbox
-            default-expand-all
-            check-strictly/>
+          <el-tree ref="menuTreeDialog" :data="menuTreeData" :props="defaultProps" :filter-node-method="filterNode" class="filter-tree"
+            node-key="id" highlight-current show-checkbox default-expand-all check-strictly>
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+              <span>
+                  <i><svg-icon :icon-class="node.icon"></svg-icon></i>&nbsp;{{ node.label }}
+              </span>              
+            </span>
+          </el-tree>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -136,7 +132,8 @@ export default {
         }
       ],
       listQuery: {
-        name: undefined
+        like_menu_name: undefined,
+        order: 'sort_num'
       },
       treeData: [],
       menuTreeData: [],
@@ -230,7 +227,7 @@ export default {
       }
       this.form.parentMenuId = keyArr[0]
       getObj(keyArr[0]).then(response => {
-        this.form.parentMenuName = response.data.sysMenu.menuName
+        this.form.parentMenuName = response.data.obj.menuName
       })
       this.dialogTableVisible = false
     },
@@ -250,7 +247,7 @@ export default {
         this.formStatus = 'update'
       }
       getObj(data.id).then(response => {
-        this.form = response.data.sysMenu
+        this.form = response.data.obj
       })
       this.currentId = data.id
       this.showElement = true

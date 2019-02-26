@@ -1,28 +1,15 @@
 import request from '@/utils/request'
 
-const path = '/system-web/depot/'
+const path = '/system-web/dict/'
 
-export function requestTree(query) {
+export function page(query) {
   return request({
-    url: path + 'getAllDepot',
+    url: path + 'page',
     method: 'get',
     params: query
   })
 }
 
-export function getDepotTree() {
-  return request({
-    url: path + 'getDepotTree',
-    method: 'get'
-  })
-}
-
-export function requestAll() {
-  return request({
-    url: path + '/all',
-    method: 'get'
-  })
-}
 export function addObj(obj) {
   return request({
     url: path + 'add',
@@ -43,7 +30,7 @@ export function delObj(id, obj) {
     url: path + id,
     method: 'delete',
     params: {
-      eq_pk_depot_id: id
+      eq_pk_dict_id: id
     }
   })
 }
@@ -55,3 +42,18 @@ export function putObj(id, obj) {
     data: obj
   })
 }
+
+export function getParent(id, obj) {
+  return request({
+    url: path + 'getParent',
+    method: 'get'
+  })
+}
+
+export function getChild(id) {
+  return request({
+    url: path + 'getChild/' + id,
+    method: 'get'
+  })
+}
+

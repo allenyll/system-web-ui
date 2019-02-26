@@ -35,7 +35,6 @@ function filterAsyncRouter(routes, menus) {
   routes.forEach(route => {
     const tmp = { ...route }
     if (hasPermission(menus, tmp)) {
-      console.log('aa')
       if (tmp.children) {
         tmp.children = filterAsyncRouter(tmp.children, menus)
       }
@@ -61,9 +60,7 @@ const permission = {
     GenerateRoutes({ commit }, data) {
       return new Promise(resolve => {
         const menus = data.menuList
-        console.log(menus)
         const accessedRouters = filterAsyncRouter(asyncRouterMap, menus)
-        console.log(accessedRouters)
         commit('SET_ROUTERS', accessedRouters)
         resolve()
       })

@@ -1,44 +1,44 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" style="width: 200px;" class="filter-item" placeholder="姓名" @keyup.enter.native="handleFilter"/>
-      <el-input v-model="listQuery.account" style="width: 200px;" class="filter-item" placeholder="账户" @keyup.enter.native="handleFilter"/>
-      <el-input v-model="listQuery.phone" style="width: 200px;" class="filter-item" placeholder="手机号" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.like_user_name" style="width: 200px;" class="filter-item" placeholder="姓名" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.eq_account" style="width: 200px;" class="filter-item" placeholder="账户" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.eq_phone" style="width: 200px;" class="filter-item" placeholder="手机号" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button v-if="userManager_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
     </div>
     <el-table v-loading.body="listLoading" :key="tableKey" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column v-if="show" align="center" label="ID" width="0">
+      <el-table-column v-if="show" align="center" label="ID">
         <template scope="scope">
           <span>{{ scope.row.pkUserId }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="姓名">
+      <el-table-column align="center" label="姓名">
         <template scope="scope">
           <span>{{ scope.row.userName }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="账户">
+      <el-table-column align="center" label="账户">
         <template scope="scope">
           <span>{{ scope.row.account }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="部门">
+      <el-table-column align="center" label="部门">
         <template scope="scope">
           <span>{{ scope.row.depotName }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="状态">
+      <el-table-column align="center" label="状态">
         <template scope="scope">
-          <span>{{ scope.row.realStatus }}</span>
+          <span>{{ scope.row.status | statusFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="性别">
+      <el-table-column align="center" label="性别">
         <template scope="scope">
-          <span>{{ scope.row.realSex }}</span>
+          <span>{{ scope.row.sex | sexFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="150" align="center" label="手机号">
+      <el-table-column align="center" label="手机号">
         <template scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
@@ -53,7 +53,7 @@
       </template> </el-table-column>
     </el-table>
     <div v-show="!listLoading" class="pagination-container">
-      <el-pagination :current-page.sync="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+      <el-pagination :current-page.sync="listQuery.page" :page-sizes="[10,20,30,40,50]" :page-size="listQuery.limit" :total="total" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
@@ -129,6 +129,22 @@ import { getDepotTree } from '@/api/admin/depot/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'User',
+  filters: {
+    statusFilter: function(val){
+      const map = {
+        'SW0001' : '启用',
+        'SW0002' : '冻结'
+      }
+      return map[val]
+    },
+    sexFilter: function(val){
+      const map = {
+        'SW0200' : '女',
+        'SW0201' : '男'
+      }
+      return map[val]
+    }
+  },
   data() {
     return {
       form: {
@@ -198,10 +214,10 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        name: '',
+        like_user_name: '',
         status: '',
-        account: '',
-        phone: ''
+        eq_account: '',
+        eq_phone: ''
       },
       sexOptions: [
         {
@@ -256,7 +272,7 @@ export default {
       this.listLoading = true
       page(this.listQuery)
         .then(response => {
-          this.list = response.data.userList
+          this.list = response.data.list
           this.total = response.data.total
           this.listLoading = false
         })
@@ -296,7 +312,7 @@ export default {
       }
       this.form.fkDepotId = keyArr[0]
       getDepotObj(keyArr[0]).then(response => {
-        this.form.depotName = response.data.sysDepot.depotName
+        this.form.depotName = response.data.obj.depotName
       })
       this.dialogDepotVisible = false
     },
@@ -379,7 +395,7 @@ export default {
     handleUpdate(row) {
       getObj(row.pkUserId)
         .then(response => {
-          this.form = response.data.sysUser
+          this.form = response.data.obj
           this.dialogFormVisible = true
           this.dialogStatus = 'update'
         })

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.account" style="width: 200px;" class="filter-item" placeholder="操作人姓名" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.like_account" style="width: 200px;" class="filter-item" placeholder="操作人姓名" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
     </div>
     <el-table v-loading.body="listLoading" :key="tableKey" :data="list" border fit highlight-current-row style="width: 100%">
@@ -27,7 +27,7 @@
       </el-table-column>
       <el-table-column width="100px" align="center" label="日志类型">
         <template scope="scope">
-          <span>{{ scope.row.logTypeMsg }}</span>
+          <span>{{ scope.row.logType | logTypeFilter}}</span>
         </template>
       </el-table-column>
       <el-table-column v-if="fkUserIdIfShow" width="200px" align="center" label="操作人ID">
@@ -45,7 +45,12 @@
           <span>{{ scope.row.ip }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="200px">
+      <el-table-column width="200px" align="center" label="操作时间">
+        <template scope="scope">
+          <span>{{ scope.row.addTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" width="150px">
         <template scope="scope">
           <el-button v-if="logManager_btn_check" size="small" type="success" icon="el-icon-search" @click="checkLogDetail(scope.row)">查看</el-button>
         </template>
@@ -64,8 +69,10 @@
         <el-form-item label="操作时间(ms)" prop="operateTime">
           <el-input v-model="form.operateTime" readonly/>
         </el-form-item>
-        <el-form-item label="日志类型" prop="logTypeMsg">
-          <el-input v-model="form.logTypeMsg" readonly/>
+        <el-form-item label="日志类型" prop="logType">
+          <el-select v-model="form.logType" class="filter-item" placeholder="请选择" readonly>
+            <el-option v-for="item in logTypeOptions" :key="item.value" :label="item.name" :value="item.value"/>
+          </el-select>
         </el-form-item>
         <el-form-item label="操作类" prop="className">
           <el-input v-model="form.className" readonly/>
@@ -88,28 +95,47 @@
 </template>
 
 <script>
-import { page, getObj } from '@/api/admin/log/index'
+import { page, getObj } from '@/api/monitor/log/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'Log',
+  filters: {
+    logTypeFilter: function(val){
+      const map = {
+        'SW0301' : '系统日志',
+        'SW0302' : '操作日志'
+      }
+      return map[val]
+    }
+  },
   data() {
     return {
       form: {
         operation: undefined,
         account: undefined,
         operateTime: undefined,
-        logTypeMsg: undefined,
+        logType: undefined,
         className: undefined,
         params: undefined,
         ip: undefined
       },
+      logTypeOptions: [
+        {
+          'name': '系统日志',
+          'value': 'SW0301'
+        },
+        {
+          'name': '操作日志',
+          'value': 'SW0302'
+        }
+      ],
       list: null,
       total: null,
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 20,
-        account: ''
+        limit: 10,
+        like_account: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -140,7 +166,7 @@ export default {
     getList() {
       this.listLoading = true
       page(this.listQuery).then(response => {
-        this.list = response.data.logList
+        this.list = response.data.list
         this.total = response.data.total
         this.listLoading = false
       })
@@ -159,7 +185,7 @@ export default {
     checkLogDetail(row) {
       getObj(row.pkLogId)
         .then(response => {
-          this.form = response.data.sysLog
+          this.form = response.data.obj
           this.dialogFormVisible = true
           this.dialogStatus = 'check'
         })

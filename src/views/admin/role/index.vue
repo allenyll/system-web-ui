@@ -1,32 +1,32 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" style="width: 200px;" class="filter-item" placeholder="角色名称" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.like_role_name" style="width: 200px;" class="filter-item" placeholder="角色名称" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button v-if="role_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
     </div>
     <el-table v-loading.body="listLoading" :key="tableKey" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column v-if="showId" align="center" label="ID" width="0">
+      <el-table-column v-if="showId" align="center" label="ID">
         <template scope="scope">
           <span>{{ scope.row.pkRoleId }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="姓名">
+      <el-table-column align="center" label="姓名">
         <template scope="scope">
           <span>{{ scope.row.roleName }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="签名">
+      <el-table-column align="center" label="签名">
         <template scope="scope">
           <span>{{ scope.row.roleSign }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="150" align="center" label="备注">
+      <el-table-column align="center" label="备注">
         <template scope="scope">
           <span>{{ scope.row.remark }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="180" align="center" label="最后时间">
+      <el-table-column align="center" label="最后时间">
         <template scope="scope">
           <span>{{ scope.row.updateTime }}</span>
         </template>
@@ -63,7 +63,7 @@
     </el-dialog>
     <el-dialog :visible.sync="dialogMenuVisible" :before-close="cancleMenu" title="菜单树" width="20%">
       <el-row style="margin:0 auto;">
-        <el-col :span="15" style="margin-left:30px;">
+        <el-col :span="18" style="margin-left:30px;">
           <el-tree
             ref="menuTreeDialog"
             :data="menuTreeData"
@@ -72,7 +72,14 @@
             node-key="id"
             highlight-current
             show-checkbox
-            check-strictly /> <!---->
+            check-strictly>
+
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+              <span>
+                  <i><svg-icon :icon-class="node.icon"></svg-icon></i>&nbsp;{{ node.label }}
+              </span>              
+            </span>
+          </el-tree>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -119,7 +126,7 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        name: ''
+        like_role_name: ''
       },
       dialogFormVisible: false,
       dialogMenuVisible: false,
@@ -161,7 +168,7 @@ export default {
       this.listLoading = true
       page(this.listQuery)
         .then(response => {
-          this.list = response.data.roleList
+          this.list = response.data.list
           this.total = response.data.total
           this.listLoading = false
         })
@@ -223,7 +230,7 @@ export default {
     handleUpdate(row) {
       getObj(row.pkRoleId)
         .then(response => {
-          this.form = response.data.sysRole
+          this.form = response.data.obj
           this.dialogFormVisible = true
           this.dialogStatus = 'update'
         })
@@ -276,8 +283,7 @@ export default {
       set[formName].validate(valid => {
         if (valid) {
           this.dialogFormVisible = false
-          this.$refs.menuTreeDialog.setCheckedKeys([])
-          this.form.password = undefined
+          // this.$refs.menuTreeDialog.setCheckedKeys([])
           putObj(this.form.pkRoleId, this.form).then(() => {
             this.dialogFormVisible = false
             this.getList()

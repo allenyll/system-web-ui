@@ -1,8 +1,10 @@
 import request from '@/utils/request'
 
+const path = '/system-web/log/'
+
 export function page(query) {
   return request({
-    url: '/sysLog/page',
+    url: path + 'page',
     method: 'get',
     params: query
   })
@@ -10,7 +12,7 @@ export function page(query) {
 
 export function getObj(id) {
   return request({
-    url: '/sysLog/' + id,
+    url: path + id,
     method: 'get'
   })
 }

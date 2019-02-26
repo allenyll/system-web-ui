@@ -204,7 +204,7 @@ export default {
       }
       this.form.parentDepotId = keyArr[0]
       getObj(keyArr[0]).then(response => {
-        this.form.parentDepotName = response.data.sysDepot.depotName
+        this.form.parentDepotName = response.data.obj.depotName
       })
       this.dialogDepotVisible = false
     },
@@ -220,7 +220,7 @@ export default {
       console.log(row)
       getObj(row.id)
         .then(response => {
-          this.form = response.data.sysDepot
+          this.form = response.data.obj
           this.dialogFormVisible = true
           this.dialogStatus = 'update'
         })

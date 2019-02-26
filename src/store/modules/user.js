@@ -1,5 +1,6 @@
 import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import router from '@/router'
 
 const user = {
   state: {
@@ -137,6 +138,24 @@ const user = {
         commit('SET_TOKEN', '')
         removeToken()
         resolve()
+      })
+    },
+
+    // 404报错
+    404({ commit }) {
+      return new Promise(resolve => {
+        router.push({
+          path: '/404'
+        })
+      })
+    },
+
+    // 401报错
+    401({ commit }) {
+      return new Promise(resolve => {
+        router.push({
+          path: '/401'
+        })
       })
     },
 

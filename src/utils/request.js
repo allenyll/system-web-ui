@@ -43,10 +43,18 @@ service.interceptors.response.use(
    * 如想通过 xmlhttprequest 来状态码标识 逻辑可写在下面error中
    */
   response => {
-    const res = response.data
-    const header = response.HEADER
-    console.log(response)
+    const res = response.response.data
+    const header = response.response.headers
+    console.log(res)
     console.log('HEADER' + header)
+    if (res.status === 404) {
+      store.dispatch('404').then(() => {
+      })
+    }
+    if (res.status === 401) {
+      store.dispatch('401').then(() => {
+      })
+    }
     const flag = true
     if (flag) { // res.code !== 20000
       Message({
@@ -55,7 +63,7 @@ service.interceptors.response.use(
         duration: 5 * 1000
       })
       // 8001:非法的token;   8002:Token 过期了;
-      if (header.ERROR_CODE === 8001 || res.code === 8002) {
+      if (header.ERROR_CODE === 8001 || header.ERROR_CODE === 8002) {
         // 请自行在引入 MessageBox
         // import { Message, MessageBox } from 'element-ui'
         MessageBox.confirm(header.ERROR_INFO, '确定登出', { // '你已被登出，可以取消继续留在该页面，或者重新登录'
