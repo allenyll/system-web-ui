@@ -135,6 +135,12 @@ export const asyncRouterMap = [
         component: () => import('@/views/monitor/generator/index'),
         name: '代码工具',
         meta: { title: '代码工具', icon: 'sw-code', perms: 'sys:generator:generator', noCache: true }
+      },
+      {
+        path: 'cache',
+        component: () => import('@/views/monitor/cache/index'),
+        name: '缓存管理',
+        meta: { title: '缓存管理', icon: 'sw-cache', perms: 'sys:cache:cache', noCache: true }
       }
     ]
   },
