@@ -158,10 +158,17 @@ export const asyncRouterMap = [
         meta: { title: '会员管理', icon: 'sw-role', perms: 'customer:customer:list', noCache: true }
       },
       {
-        path: 'point',
-        component: () => import('@/views/customer/point/index'),
+        path: 'customerPoint',
+        component: () => import('@/views/customer/customerPoint/index'),
         name: '积分管理',
         meta: { title: '积分管理', icon: 'sw-point', perms: 'customer:point:list', noCache: true }
+      },
+      {
+        path: 'customerPointDetail',
+        component: () => import('@/views/customer/customerPointDetail/index'),
+        name: '积分详情',
+        meta: { title: '积分详情', noCache: true, perms: 'customer:customerPointDetail:list' },
+        hidden: true
       },
       {
         path: 'balance',

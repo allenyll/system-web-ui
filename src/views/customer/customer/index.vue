@@ -1,14 +1,25 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.customerName" style="width: 200px;" class="filter-item" placeholder="姓名" @keyup.enter.native="handleFilter"/>
-      <el-input v-model="listQuery.customerAccount" style="width: 200px;" class="filter-item" placeholder="账户" @keyup.enter.native="handleFilter"/>
-      <el-input v-model="listQuery.phone" style="width: 200px;" class="filter-item" placeholder="手机号" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.like_customerName" style="width: 200px;" class="filter-item" placeholder="姓名" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.like_customerAccount" style="width: 200px;" class="filter-item" placeholder="账户" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.like_phone" style="width: 200px;" class="filter-item" placeholder="手机号" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button v-if="customerManager_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
     </div>
-    <el-table v-loading.body="listLoading" :key="tableKey" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column v-if="show" align="center" label="ID">
+    <div>
+      <FilenameOption v-model="filename" />
+      <AutoWidthOption v-model="autoWidth" />
+      <BookTypeOption v-model="bookType" />
+      <el-button :loading="downloadLoading" style="margin:0 0 20px 20px;" type="primary" icon="document" @click="handleDownload">导出</el-button>
+    </div>
+    <el-table v-loading.body="listLoading" element-loading-text="拼命加载中" :key="tableKey" :data="list" border fit highlight-current-row style="width: 100%">
+      <el-table-column align="center" label="序号">
+        <template slot-scope="scope">
+          {{ scope.$index }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="show" align="center" label="主键ID">
         <template scope="scope">
           <span>{{ scope.row.pkCustomerId }}</span>
         </template>
@@ -35,20 +46,20 @@
       </el-table-column>
       <el-table-column align="center" label="状态">
         <template scope="scope">
-          <span>{{ scope.row.statusName }}</span>
+          <span>{{ scope.row.status | statusFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="性别">
         <template scope="scope">
-          <span>{{ scope.row.genderName }}</span>
+          <span>{{ scope.row.gender | sexFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="300"> 
+      <el-table-column align="center" label="操作"> 
         <template scope="scope">
-            <el-button v-if="customerManager_btn_edit" size="small" type="success" icon="el-icon-edit" @click="handleUpdate(scope.row)">编辑
+            <el-button v-if="customerManager_btn_edit" size="small" type="success" icon="el-icon-edit" @click="handleUpdate(scope.row)">查看
             </el-button>
-            <el-button v-if="customerManager_btn_del" size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除
-            </el-button>
+            <!-- <el-button v-if="customerManager_btn_del" size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除
+            </el-button> -->
         </template> 
       </el-table-column>
     </el-table>
@@ -58,32 +69,32 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="姓名" prop="customerName">
-          <el-input v-model="form.customerName" placeholder="请输入姓名"/>
+          <el-input v-model="form.customerName" placeholder="请输入姓名" disabled/>
         </el-form-item>
         <el-form-item label="账户" prop="customerAccount">
           <el-input v-if="dialogStatus == 'create'" v-model="form.customerAccount" placeholder="请输入账户"/>
-          <el-input v-else v-model="form.customerAccount" placeholder="请输入账户" readonly/>
+          <el-input v-else v-model="form.customerAccount" placeholder="请输入账户" disabled/>
         </el-form-item>
-        <el-form-item label="状态" placeholder="请选择状态" prop="status">
-          <el-radio v-model="form.status" label="SW0001">启用</el-radio>
-          <el-radio v-model="form.status" label="SW0002">冻结</el-radio>
+        <el-form-item label="状态" placeholder="请选择状态" prop="status" disabled>
+          <el-radio disabled v-model="form.status" label="SW0001">启用</el-radio>
+          <el-radio disabled v-model="form.status" label="SW0002">冻结</el-radio>
         </el-form-item>
         <el-form-item label="性别">
-          <el-select v-model="form.gender" class="filter-item" placeholder="请选择">
+          <el-select v-model="form.gender" class="filter-item" placeholder="请选择" disabled>
             <el-option v-for="item in sexOptions" :key="item.value" :label="item.name" :value="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入手机号"/>
+          <el-input v-model="form.phone" placeholder="请输入手机号" disabled/>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="请输入邮箱"/>
+          <el-input v-model="form.email" placeholder="请输入邮箱" disabled/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel('form')">取 消</el-button>
         <el-button v-if="dialogStatus=='create'" type="primary" @click="create('form')">确 定</el-button>
-        <el-button v-else type="primary" @click="update('form')">确 定</el-button>
+        <!-- <el-button v-else type="primary" @click="update('form')">确 定</el-button> -->
       </div>
     </el-dialog>
   </div>
@@ -93,8 +104,30 @@
 import { page, addObj, getObj, delObj, putObj } from '@/api/customer/customer/index'
 import { getDepotTree } from '@/api/admin/depot/index'
 import { mapGetters } from 'vuex'
+
+import FilenameOption from '@/components/excel/FilenameOption'
+import BookTypeOption from '@/components/excel/BookTypeOption'
+import AutoWidthOption from '@/components/excel/AutoWidthOption'
+
 export default {
   name: 'Customer',
+  components: { FilenameOption, BookTypeOption, AutoWidthOption },
+  filters: {
+    sexFilter: function(val){
+      const map = {
+        'SW0201' : '男',
+        'SW0200' : '女'
+      }
+      return map[val]
+    },
+    statusFilter: function(val){
+      const map = {
+        'SW0001' : '启用',
+        'SW0002' : '冻结'
+      }
+      return map[val]
+    }
+  },
   data() {
     return {
       form: {
@@ -134,10 +167,6 @@ export default {
           }
         ]
       },
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      },
       show: false,
       list: null,
       total: null,
@@ -145,10 +174,9 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        customerName: '',
-        status: '',
-        customerAccount: '',
-        phone: ''
+        like_customerName: '',
+        like_customerAccount: '',
+        like_phone: ''
       },
       sexOptions: [
         {
@@ -157,7 +185,7 @@ export default {
         },
         {
           'name': '女',
-          'value': 'SW0202'
+          'value': 'SW0200'
         }
       ],
       dialogFormVisible: false,
@@ -165,13 +193,16 @@ export default {
       customerManager_btn_edit: false,
       customerManager_btn_del: false,
       customerManager_btn_add: false,
-      customerManager_btn_config_role: false,
       textMap: {
         update: '编辑',
         create: '创建'
       },
       tableKey: 0,
-      configCustomerId: ''
+      configCustomerId: '',
+      downloadLoading: false,
+      filename: '',
+      bookType: 'xlsx',
+      autoWidth: true,
     }
   },
   watch: {
@@ -216,7 +247,7 @@ export default {
     handleUpdate(row) {
       getObj(row.pkCustomerId)
         .then(response => {
-          this.form = response.data.customer
+          this.form = response.data.obj
           this.dialogFormVisible = true
           this.dialogStatus = 'update'
         })
@@ -285,6 +316,37 @@ export default {
         }
       })
     },
+    handleDownload() {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then(excel => {
+        const tHeader = ['姓名', '账户', '手机号', '邮箱', '性别', '国家', '省份', '城市']
+        const filterVal = ['customerName', 'customerAccount', 'phone', 'email', 'gender', 'country', 'province', 'city']
+        const list = this.list
+        const data = this.formatJson(filterVal, list)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: this.filename,
+          bookType: this.bookType,
+          autoWidth: this.autoWidth
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => {
+        if(j === 'gender'){
+          console.log(v[j])
+          if(v[j] === 'SW0200'){
+            return '女'
+          }else{
+            return '男'
+          }
+        }else{
+          return v[j]        
+        }
+      }))
+    },
     resetTemp() {
       this.form = {
         customerName: undefined,
@@ -299,3 +361,12 @@ export default {
   }
 }
 </script>
+<style>
+.radio-label {
+  font-size: 14px;
+  color: #606266;
+  line-height: 40px;
+  padding: 0 12px 0 30px;
+}
+</style>
+
