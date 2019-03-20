@@ -141,6 +141,12 @@ export const asyncRouterMap = [
         component: () => import('@/views/monitor/cache/index'),
         name: '缓存管理',
         meta: { title: '缓存管理', icon: 'sw-cache', perms: 'sys:cache:cache', noCache: true }
+      },
+      {
+        path: 'job',
+        component: () => import('@/views/admin/job/index'),
+        name: '调度任务',
+        meta: { title: '调度任务', icon: 'sw-job', perms: 'sys:job:list', noCache: true }
       }
     ]
   },
