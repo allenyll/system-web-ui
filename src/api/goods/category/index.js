@@ -1,10 +1,25 @@
 import request from '@/utils/request'
 
-const path = '/system-web/dict/'
+const path = '/system-web/category/'
 
-export function getList(code) {
+export function tree(query) {
   return request({
-    url: path + 'list/' + code,
+    url: path + 'tree',
+    method: 'get',
+    params: query
+  })
+}
+
+export function categoryTree() {
+  return request({
+    url: path + 'categoryTree',
+    method: 'get'
+  })
+}
+
+export function getCategoryList() {
+  return request({
+    url: path + 'list',
     method: 'post'
   })
 }
@@ -37,7 +52,7 @@ export function delObj(id, obj) {
     url: path + id,
     method: 'delete',
     params: {
-      eq_pk_dict_id: id
+      eq_pk_category_id: id
     }
   })
 }
@@ -49,18 +64,3 @@ export function putObj(id, obj) {
     data: obj
   })
 }
-
-export function getParent(id, obj) {
-  return request({
-    url: path + 'getParent',
-    method: 'get'
-  })
-}
-
-export function getChild(id) {
-  return request({
-    url: path + 'getChild/' + id,
-    method: 'get'
-  })
-}
-

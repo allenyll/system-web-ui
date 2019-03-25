@@ -75,7 +75,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <el-dialog :visible.sync="dialogTableVisible" title="菜单树" width="20%">
+    <el-dialog :visible.sync="dialogTableVisible" title="菜单树" width="25%">
       <el-row style="margin:0 auto;">
         <el-col :span="15" style="margin-left:30px;">
           <el-input v-model="filterMenuText" placeholder="输入关键字过滤" style="margin-bottom:15px;"/>

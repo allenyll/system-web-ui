@@ -119,13 +119,6 @@ export default {
       listQuery: {
         name: ''
       },
-      form: {
-        depotName: undefined,
-        depotCode: undefined,
-        parentDepotName: undefined,
-        parentDepotId: undefined,
-        sort: undefined
-      },
       dialogStatus: '',
       textMap: {
         update: '编辑',

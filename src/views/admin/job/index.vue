@@ -3,6 +3,11 @@
     <div class="filter-container">
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="任务名称" v-model="listQuery.like_job_name"> </el-input>
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="调用类名" v-model="listQuery.like_class_name"> </el-input>
+      <el-select @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="请选择状态" v-model="listQuery.eq_status">
+        <el-option key="" label="全部" value=""> </el-option>
+        <el-option key="SW1302" label="启用" value="SW1302"> </el-option>
+        <el-option key="SW1301" label="停用" value="SW1301"> </el-option>
+      </el-select>
       <el-button class="filter-item" type="primary" icon="search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" v-if="jobManager_btn_add" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">添加</el-button>
     </div>
@@ -29,8 +34,7 @@
           </el-table-column>
           <el-table-column width="80px" align="center" label="任务状态">
             <template scope="scope">
-              <el-tag :type="statusTypeFilter">{{ scope.row.status | statusFilters }}</el-tag>
-              <!-- <span>{{scope.row.status | statusFilters}}</span> -->
+              <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilters }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column width="200px" align="center" label="调用类名">
@@ -61,7 +65,7 @@
           </el-button>
           <el-button v-show="jobManager_btn_status" size="small" type="info" @click="handleStatus(scope.row, 'start')">启用
           </el-button>
-          <el-button v-show="jobManager_btn_status" size="small" type="info" @click="handleStatus(scope.row, 'stop')">停用
+          <el-button v-show="jobManager_btn_status" size="small" type="warning" @click="handleStatus(scope.row, 'stop')">停用
           </el-button>
         </template>
       </el-table-column>
@@ -81,7 +85,8 @@
               <el-input v-model="form.corn" placeholder="请输入表达式"></el-input>
             </el-form-item>
             <el-form-item label="任务状态" prop="status">
-              <el-input v-model="form.status" placeholder="请输入任务状态"></el-input>
+              <el-radio v-model="form.status" label="SW1301">停用</el-radio>
+              <el-radio v-model="form.status" label="SW1302">启用</el-radio>
             </el-form-item>
             <el-form-item label="调用类名" prop="className">
               <el-input v-model="form.className" placeholder="请输入调用类名"></el-input>
@@ -119,12 +124,12 @@
         return map[val]
       },
       statusTypeFilter(status) {
-      const statusMap = {
-        'SW1302': 'success',
-        'SW1301': 'info'
+        const statusMap = {
+          'SW1302': 'success',
+          'SW1301': 'info'
+        }
+        return statusMap[status]
       }
-      return statusMap[status]
-    }
     },
     data() {
       return {
@@ -216,9 +221,9 @@
         page(this.listQuery)
             .then(response => {
           this.list = response.data.list;
-        this.total = response.data.total;
-        this.listLoading = false;
-      })
+          this.total = response.data.total;
+          this.listLoading = false;
+        })
       },
       handleFilter() {
         this.getList();
@@ -360,7 +365,7 @@
               jobName : undefined,
               methodName : undefined,
               corn : undefined,
-              status : undefined,
+              status : 'SW1302',
               className : undefined,
               jobGroup : undefined,
               description : undefined,

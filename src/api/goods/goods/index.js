@@ -1,13 +1,6 @@
 import request from '@/utils/request'
 
-const path = '/system-web/dict/'
-
-export function getList(code) {
-  return request({
-    url: path + 'list/' + code,
-    method: 'post'
-  })
-}
+const path = '/system-web/goods/'
 
 export function page(query) {
   return request({
@@ -37,7 +30,7 @@ export function delObj(id, obj) {
     url: path + id,
     method: 'delete',
     params: {
-      eq_pk_dict_id: id
+      eq_pk_goods_id: id
     }
   })
 }
@@ -49,18 +42,3 @@ export function putObj(id, obj) {
     data: obj
   })
 }
-
-export function getParent(id, obj) {
-  return request({
-    url: path + 'getParent',
-    method: 'get'
-  })
-}
-
-export function getChild(id) {
-  return request({
-    url: path + 'getChild/' + id,
-    method: 'get'
-  })
-}
-

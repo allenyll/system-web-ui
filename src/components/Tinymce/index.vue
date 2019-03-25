@@ -50,14 +50,13 @@ export default {
       tinymceId: this.id,
       fullscreen: false,
       languageTypeList: {
-        'en': 'en',
         'zh': 'zh_CN'
       }
     }
   },
   computed: {
     language() {
-      return this.languageTypeList[this.$store.getters.language]
+      return this.languageTypeList['zh']
     }
   },
   watch: {

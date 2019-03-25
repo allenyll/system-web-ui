@@ -1,0 +1,334 @@
+<template>
+  <div class="app-container calendar-list-container">
+    <div class="filter-container">
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="名称" v-model="listQuery.like_size_name"> </el-input>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="编码" v-model="listQuery.eq_size_code"> </el-input>
+      <el-select @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="请选择状态" v-model="listQuery.eq_is_used">
+        <el-option key="" label="全部" value=""> </el-option>
+        <el-option key="SW1302" label="启用" value="SW1302"> </el-option>
+        <el-option key="SW1301" label="停用" value="SW1301"> </el-option>
+      </el-select>
+      <el-select @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="请选择是否默认" v-model="listQuery.eq_is_default">
+        <el-option key="" label="全部" value=""> </el-option>
+        <el-option key="SW1001" label="是" value="SW1001"> </el-option>
+        <el-option key="SW1002" label="否" value="SW1002"> </el-option>
+      </el-select>
+      <el-button class="filter-item" type="primary" icon="search" @click="handleFilter">搜索</el-button>
+      <el-button class="filter-item" v-if="sizeManager_btn_add" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">添加</el-button>
+    </div>
+    <el-table :key='tableKey' :data="list" v-loading.body="listLoading" border fit highlight-current-row style="width: 100%">
+          <el-table-column align="center" label="pk_size_id" v-if="show">
+            <template scope="scope">
+              <span>{{scope.row.pkSizeId}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="所在分组">
+            <template scope="scope">
+              <span>{{groupMap[scope.row.fkSizeGroupId]}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="名称">
+            <template scope="scope">
+              <span>{{scope.row.sizeName}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="编码">
+            <template scope="scope">
+              <span>{{scope.row.sizeCode}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="是否启用">
+            <template scope="scope">
+              <el-tag :type="scope.row.isUsed | statusTypeFilter">{{ scope.row.isUsed | statusFilter }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="是否默认">
+            <template scope="scope">
+               <el-tag :type="scope.row.isDefault | defalutTypeFilter">{{ scope.row.isDefault | defalutFilter }}</el-tag>
+            </template>
+          </el-table-column>
+      <el-table-column fixed="right" align="center" label="操作" width="150px">
+        <template scope="scope">
+          <el-button v-if="sizeManager_btn_edit" size="small" type="success" @click="handleUpdate(scope.row)">编辑
+          </el-button>
+          <el-button v-if="sizeManager_btn_del" size="small" type="danger" @click="handleDelete(scope.row)">删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div v-show="!listLoading" class="pagination-container">
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
+    </div>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-form :model="form" :rules="rules" ref="form" label-width="100px">
+            <el-form-item label="所在分组" prop="fkSizeGroupId">
+              <el-select v-model="form.fkSizeGroupId" filterable placeholder="请选择">
+                <el-option
+                  v-for="item in sizeGroupIdOptions" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="名称" prop="sizeName">
+              <el-input v-model="form.sizeName" placeholder="请输入名称"></el-input>
+            </el-form-item>
+            <el-form-item label="编码" prop="sizeCode">
+              <el-input v-model="form.sizeCode" placeholder="请输入编码"></el-input>
+            </el-form-item>
+            <el-form-item label="是否启用" prop="isUsed">
+              <el-radio v-model="form.isUsed" label="SW1301">停用</el-radio>
+              <el-radio v-model="form.isUsed" label="SW1302">启用</el-radio>
+            </el-form-item>
+            <el-form-item label="是否默认" prop="isDefault">
+              <el-radio v-model="form.isDefault" label="SW1001">是</el-radio>
+              <el-radio v-model="form.isDefault" label="SW1002">否</el-radio>
+            </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel('form')">取 消</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="create('form')">确 定</el-button>
+        <el-button v-else type="primary" @click="update('form')">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import { page, addObj, getObj, delObj, putObj } from '@/api/goods/size/index';
+  import { list } from '@/api/goods/sizeGroup/index';
+  import { mapGetters } from 'vuex';
+  export default {
+    name: 'size',
+    filters: {
+      statusFilter: function(val){
+        const map = {
+          'SW1301' : '停用',
+          'SW1302' : '启用'
+        }
+        return map[val]
+      },
+      defalutFilter: function(val){
+        const map = {
+          'SW1001' : '是',
+          'SW1002' : '否'
+        }
+        return map[val]
+      },
+      statusTypeFilter(val) {
+        const map = {
+          'SW1302': 'success',
+          'SW1301': 'info'
+        }
+        return map[val]
+      },
+      defalutTypeFilter(val) {
+        const map = {
+          'SW1001': 'danger',
+          'SW1002': 'info'
+        }
+        return map[val]
+      }
+    },
+    data() {
+      return {
+        form: {
+          fkSizeGroupId : undefined,
+          sizeName : undefined,
+          sizeCode : undefined,
+          isUsed : "SW1302",
+          isDefault : "SW1001",
+        },
+        rules: {
+          fkSizeGroupId: [
+            {
+              required: true,
+              message: '请输入分组主键',
+              trigger: 'blur'
+            }
+          ],           
+          sizeName: [
+            {
+              required: true,
+              message: '请输入名称',
+              trigger: 'blur'
+            }
+          ],           
+          sizeCode: [
+            {
+              required: true,
+              message: '请输入编码',
+              trigger: 'blur'
+            }
+          ],  
+          isUsed: [
+            {
+              required: true,
+              message: '请输入是否启用',
+              trigger: 'blur'
+            }
+          ],           isDefault: [
+            {
+              required: true,
+              message: '请输入是否默认',
+              trigger: 'blur'
+            }
+          ]        },
+        list: null,
+        total: null,
+        listLoading: true,
+        listQuery: {
+          page: 1,
+          limit: 20,
+          name: undefined
+        },
+        sizeGroupIdOptions: [
+          {
+            value: '选项1',
+            label: '黄金糕'
+          }
+        ],
+        dialogFormVisible: false,
+        dialogStatus: '',
+        sizeManager_btn_edit: false,
+        sizeManager_btn_del: false,
+        sizeManager_btn_add: false,
+        textMap: {
+          update: '编辑',
+          create: '创建'
+        },
+        tableKey: 0,
+        show: false,
+        nameMap:{}
+      }
+    },
+    created() {
+      this.getList();
+      this.getSizeGroupList();
+      this.sizeManager_btn_edit = this.elements['goods:size:edit'];
+      this.sizeManager_btn_del = this.elements['goods:size:delete'];
+      this.sizeManager_btn_add = this.elements['goods:size:add'];
+    },
+    computed: {
+      ...mapGetters([
+        'elements'
+      ]),
+      groupMap: function(){
+        return this.nameMap
+      }
+    },
+    methods: {
+      getList() {
+        this.listLoading = true;
+        page(this.listQuery).then(response => {
+          this.list = response.data.list;
+          this.total = response.data.total;
+          this.listLoading = false;
+        })
+      },
+      getSizeGroupList() {
+        list().then(response => {
+              this.nameMap = response.data.map;
+              this.sizeGroupIdOptions = response.data.list;
+        })
+      },
+      handleFilter() {
+        this.getList();
+      },
+      handleSizeChange(val) {
+        this.listQuery.limit = val;
+        this.getList();
+      },
+      handleCurrentChange(val) {
+        this.listQuery.page = val;
+        this.getList();
+      },
+      handleCreate() {
+        this.resetTemp();
+        this.dialogStatus = 'create';
+        this.dialogFormVisible = true;
+      },
+      handleUpdate(row) {
+        getObj(row.pkSizeId)
+            .then(response => {
+          this.form = response.data.obj;
+        this.dialogFormVisible = true;
+        this.dialogStatus = 'update';
+      });
+      },
+      handleDelete(row) {
+        this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            })
+            .then(() => {
+              delObj(row.pkSizeId)
+                .then(() => {
+                    this.$notify({
+                    title: '成功',
+                    message: '删除成功',
+                    type: 'success',
+                    duration: 2000
+                  });
+                  const index = this.list.indexOf(row);
+                  this.list.splice(index, 1);
+                });
+            });
+      },
+      create(formName) {
+        const set = this.$refs;
+        set[formName].validate(valid => {
+          if (valid) {
+            addObj(this.form)
+              .then(() => {
+                this.dialogFormVisible = false;
+                this.getList();
+                this.$notify({
+                  title: '成功',
+                  message: '创建成功',
+                  type: 'success',
+                  duration: 2000
+                });
+              })
+          } else {
+            return false;
+          }
+        });
+      },
+      cancel(formName) {
+        this.dialogFormVisible = false;
+        const set = this.$refs;
+        set[formName].resetFields();
+      },
+      update(formName) {
+        const set = this.$refs;
+        set[formName].validate(valid => {
+          if (valid) {
+            this.dialogFormVisible = false;
+            this.form.password = undefined;
+            putObj(this.form.pkSizeId, this.form).then(() => {
+              this.dialogFormVisible = false;
+              this.getList();
+              this.$notify({
+                title: '成功',
+                message: '创建成功',
+                type: 'success',
+                duration: 2000
+              });
+            });
+          } else {
+            return false;
+          }
+        });
+      },
+      resetTemp() {
+        this.form = {
+              fkSizeGroupId : undefined,
+              sizeName : undefined,
+              sizeCode : undefined,
+              isUsed : "SW1302",
+              isDefault : "SW1002"
+        };
+      }
+    }
+  }
+</script>

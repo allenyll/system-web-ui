@@ -183,5 +183,56 @@ export const asyncRouterMap = [
         meta: { title: '余额管理', icon: 'sw-balance', perms: 'customer:balance:list', noCache: true }
       }
     ]
+  },
+  {
+    path: '/goods',
+    component: Layout,
+    name: '商品管理',
+    meta: { title: '商品管理', icon: 'sw-goods', perms: 'goods:goods' },
+    icon: 'setting',
+    children: [
+      {
+        path: 'brand',
+        component: () => import('@/views/goods/brand/index'),
+        name: '品牌管理',
+        meta: { title: '品牌管理', icon: 'sw-brand', noCache: true, perms: 'goods:brand:list' }
+      },
+      {
+        path: 'colorGroup',
+        component: () => import('@/views/goods/colorGroup/index'),
+        name: '颜色分组',
+        meta: { title: '颜色分组', icon: 'sw-group', perms: 'goods:colorGroup:list', noCache: true }
+      },
+      {
+        path: 'color',
+        component: () => import('@/views/goods/color/index'),
+        name: '颜色管理',
+        meta: { title: '颜色管理', icon: 'sw-color', perms: 'goods:color:list', noCache: true }
+      },
+      {
+        path: 'sizeGroup',
+        component: () => import('@/views/goods/sizeGroup/index'),
+        name: '尺码分组',
+        meta: { title: '尺码分组', icon: 'sw-group', perms: 'goods:sizeGroup:list', noCache: true }
+      },
+      {
+        path: 'size',
+        component: () => import('@/views/goods/size/index'),
+        name: '尺码管理',
+        meta: { title: '尺码管理', icon: 'sw-size', perms: 'goods:size:list', noCache: true }
+      },
+      {
+        path: 'category',
+        component: () => import('@/views/goods/category/index'),
+        name: '商品分类',
+        meta: { title: '商品分类', icon: 'sw-class', perms: 'goods:category:list', noCache: true }
+      },
+      {
+        path: 'goods',
+        component: () => import('@/views/goods/goods/index'),
+        name: '商品列表',
+        meta: { title: '商品列表', icon: 'sw-goods', perms: 'goods:goods:list', noCache: true }
+      }
+    ]
   }
 ]
