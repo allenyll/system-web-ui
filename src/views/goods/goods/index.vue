@@ -123,7 +123,7 @@
     <div v-show="!listLoading" class="pagination-container">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </div>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" @close='closeDialog'>
       <el-tabs type="border-card">
         <el-tab-pane label="商品基础信息">
           <div class="form">
@@ -299,11 +299,25 @@
         <el-tab-pane label="商品详情">
           <div class="components-container">
           <div>
-            <tinymce :height="300" v-model="form.goodsDesc"/>
+            <tinymce ref="tinymce" :height="300" v-model="form.goodsDesc"/>
           </div>
         </div>
         </el-tab-pane>
-        <el-tab-pane label="商品图片">角色管理</el-tab-pane>
+        <el-tab-pane label="商品图片">
+          <el-upload
+            action="http://localhost:8080"
+            :http-request="myUpload"
+            list-type="picture-card"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove"
+            onProgress:onProgress
+            :file-list="fileList">
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <el-dialog :visible.sync="dialogImageVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>  
+        </el-tab-pane>
       </el-tabs>
     </el-dialog>
   </div>
@@ -311,6 +325,7 @@
 
 <script>
   import { page, addObj, getObj, delObj, putObj } from '@/api/goods/goods/index';
+  import { upload, download, getFileList, delFile } from '@/api/admin/file/index';
   import { getBrandList } from '@/api/goods/brand/index';
   import { getSizeList } from '@/api/goods/size/index';
   import { getColorList } from '@/api/goods/color/index';
@@ -318,6 +333,8 @@
   import { getList} from '@/api/admin/dict/index'
   import { mapGetters } from 'vuex';
   import Tinymce from '@/components/Tinymce'
+  import { getToken } from '@/utils/auth'
+  import axios from 'axios'
   export default {
     name: 'goods',
     components: { Tinymce },
@@ -502,7 +519,11 @@
         categoryMap:[],
         categoryOptions:[],
         unitMap:[],
-        unitOptions:[]
+        unitOptions:[],
+        dialogImageUrl: '',
+        dialogImageVisible: false,
+        goodsId: '',
+        fileList: []
       }
     },
     created() {
@@ -512,6 +533,7 @@
       this.getColorList();
       this.getCategoryList();
       this.getUnitList();
+      this.download();
       this.goodsManager_btn_edit = this.elements['goods:goods:edit'];
       this.goodsManager_btn_del = this.elements['goods:goods:delete'];
       this.goodsManager_btn_add = this.elements['goods:goods:add'];
@@ -534,6 +556,85 @@
       }
     },
     methods: {
+      closeDialog() {
+        this.fileList = []
+        this.form.goodsDesc = ''
+      },
+      myUpload(content) {
+        const token = getToken()
+        let self = this
+        let config= {
+          header:{
+            'Content-Type': 'multipart/form-data',
+            'Authorization': token + ',JWT_PLATFORM'
+          },
+          onUploadProgress: progressEvent => {
+            let percent=(progressEvent.loaded / progressEvent.total * 100) | 0
+            //调用onProgress方法来显示进度条，需要传递个对象 percent为进度值
+            content.onProgress({percent:percent})
+          }
+        }
+        let formData = new FormData();
+        formData.append("file", content.file)
+        formData.append("type", "SW1801")
+        formData.append("id", this.goodsId)
+        
+        axios.post('http://localhost:8080/system-web/file/upload', formData, config).then( (res) => {
+          //做处理
+          this.getFileList(this.goodsId)
+          if(res.data.code === '100000'){
+            self.uploadMessage = '上传成功！'
+          }
+        }).catch((error) =>{
+
+    
+
+        });
+      },
+      download(){
+        // download('group1/M00/00/00/rBsAA1yY_5iALGj7AAt46MDfrYg67.jpeg').then(response => {
+        //   console.log(response)
+        // })
+      },
+      getFileList(id) {
+        const param = {
+          id: id,
+          type: "SW1801"
+        }
+        getFileList(param).then(response => {
+          this.fileList = response.data.list
+          console.log(this.fileList)
+        })
+      },
+      handleRemove(file, fileList) {
+        const param = {
+          eq_pk_file_id: file.id,
+          url: file.url
+        }
+        delFile(param).then(response => {
+          if(response.data.code === '100000'){
+            this.getFileList(this.goodsId);
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            });
+          }else{
+            this.getFileList(this.goodsId);
+            this.$notify({
+              title: '失败',
+              message: response.data.message,
+              type: 'fail',
+              duration: 2000
+            });
+          }
+        })
+      },
+      handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.dialogImageVisible = true;
+      },
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
@@ -591,13 +692,17 @@
         this.resetTemp();
         this.dialogStatus = 'create';
         this.dialogFormVisible = true;
+        this.$refs.tinymce.setContent(this.form.goodsDesc)
       },
       handleUpdate(row) {
+        this.goodsId = row.pkGoodsId;
+        this.getFileList(this.goodsId);
         getObj(row.pkGoodsId)
             .then(response => {
           this.form = response.data.obj;
         this.dialogFormVisible = true;
         this.dialogStatus = 'update';
+        this.$refs.tinymce.setContent(this.form.goodsDesc)
       });
       },
       handleDelete(row) {
@@ -650,7 +755,6 @@
         set[formName].validate(valid => {
           if (valid) {
             this.dialogFormVisible = false;
-            this.form.password = undefined;
             putObj(this.form.pkGoodsId, this.form).then(() => {
               this.dialogFormVisible = false;
               this.getList();

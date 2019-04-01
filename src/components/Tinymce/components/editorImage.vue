@@ -7,11 +7,11 @@
         :multiple="true"
         :file-list="fileList"
         :show-file-list="true"
+        :http-request="myUpload"
         :on-remove="handleRemove"
-        :on-success="handleSuccess"
         :before-upload="beforeUpload"
         class="editor-slide-upload"
-        action="https://httpbin.org/post"
+        action=""
         list-type="picture-card">
         <el-button size="small" type="primary">点击上传</el-button>
       </el-upload>
@@ -22,8 +22,9 @@
 </template>
 
 <script>
-// import { getToken } from 'api/qiniu'
-
+import { getToken } from '@/utils/auth'
+import { upload, download, getFileList, delFile } from '@/api/admin/file/index';
+import axios from 'axios'
 export default {
   name: 'EditorSlideUpload',
   props: {
@@ -40,6 +41,42 @@ export default {
     }
   },
   methods: {
+    myUpload(content) {
+      const token = getToken()
+      let self = this
+      let config= {
+        header:{
+          'Content-Type': 'multipart/form-data',
+          'Authorization': token + ',JWT_PLATFORM'
+        }
+      }
+      let formData = new FormData();
+      formData.append("file", content.file)
+      formData.append("type", "SW1803")
+      formData.append("id", "0")
+      
+      axios.post('http://localhost:8080/system-web/file/upload', formData, config).then( (res) => {
+        //做处理
+        if(res.data.code === '100000'){
+          const uid = content.file.uid
+          console.log(uid)
+          const objKeyArr = Object.keys(this.listObj)
+          console.log(objKeyArr)
+          for (let i = 0, len = objKeyArr.length; i < len; i++) {
+            if (this.listObj[objKeyArr[i]].uid === uid) {
+              this.fileList.push({url:res.data.url})
+              this.listObj[objKeyArr[i]].url = res.data.url
+              this.listObj[objKeyArr[i]].hasSuccess = true
+              return
+            }
+          }
+        }
+      }).catch((error) =>{
+
+  
+
+      });
+    },
     checkAllSuccess() {
       return Object.keys(this.listObj).every(item => this.listObj[item].hasSuccess)
     },
@@ -53,17 +90,6 @@ export default {
       this.listObj = {}
       this.fileList = []
       this.dialogVisible = false
-    },
-    handleSuccess(response, file) {
-      const uid = file.uid
-      const objKeyArr = Object.keys(this.listObj)
-      for (let i = 0, len = objKeyArr.length; i < len; i++) {
-        if (this.listObj[objKeyArr[i]].uid === uid) {
-          this.listObj[objKeyArr[i]].url = response.files.file
-          this.listObj[objKeyArr[i]].hasSuccess = true
-          return
-        }
-      }
     },
     handleRemove(file) {
       const uid = file.uid
