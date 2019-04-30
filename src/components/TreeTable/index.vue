@@ -19,7 +19,8 @@
           <i v-if="!scope.row._expanded" class="el-icon-plus"/>
           <i v-else class="el-icon-minus"/>
         </span>
-        {{ scope.row[column.value] }}
+        <img  v-if="column.ifImage === 0" :src="scope.row[column.value]"  min-width="50" height="50" />
+        <span v-if="column.ifImage === '' || column.ifImage === undefined">{{ scope.row[column.value] }}</span>
       </template>
     </el-table-column>
     <slot/>

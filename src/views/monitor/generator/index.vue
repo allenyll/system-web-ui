@@ -124,6 +124,10 @@ export default {
         {
           'name': 'goods',
           'value': 'goods'
+        },
+        {
+          'name': 'pay',
+          'value': 'pay'
         }
       ],
       tablePrefixOptions: [

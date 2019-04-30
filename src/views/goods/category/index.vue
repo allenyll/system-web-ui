@@ -15,7 +15,7 @@
         </template>
       </el-table-column>
     </tree-table>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" @close="closeDialog()">
       <el-form :model="form" :rules="rules" ref="form" label-width="100px">
             <el-form-item label="分类名称" prop="categoryName">
               <el-input v-model="form.categoryName" placeholder="请输入分类名称"></el-input>
@@ -47,6 +47,25 @@
             <el-form-item label="描述" prop="description">
               <el-input type="textarea" v-model="form.description" placeholder="请输入描述"></el-input>
             </el-form-item>
+            <el-form-item label="图片">
+              <el-upload
+                        ref="upload"
+                        action="/upload.do"
+                        :http-request="myUpload"
+                        name="picture"
+                        list-type="picture-card"
+                        :limit="1"
+                        :file-list="fileList"
+                        :on-exceed="onExceed"
+                        :before-upload="beforeUpload"
+                        :on-preview="handlePreview"
+                        :on-remove="handleRemove">
+                  <i class="el-icon-plus"></i>
+              </el-upload>
+              <el-dialog :visible.sync="dialogVisible">
+                  <img width="100%" :src="dialogImageUrl" alt="">
+              </el-dialog>
+          </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel('form')">取 消</el-button>
@@ -71,9 +90,11 @@
 </template>
 
 <script>
-  import treeTable from '@/components/TreeTable'
+  import treeTable from '@/components/TreeTable';
   import { tree, page, addObj, getObj, delObj, putObj, list, categoryTree} from '@/api/goods/category/index';
   import { mapGetters } from 'vuex';
+  import { getToken } from '@/utils/auth';
+  import axios from 'axios';
   export default {
     name: 'category',
     components: { treeTable },
@@ -83,6 +104,11 @@
           {
             text: '分类名称',
             value: 'name'
+          },
+          {
+            text: '图片',
+            value: 'url',
+            ifImage: 0
           },
           {
             text: '分类编码',
@@ -106,7 +132,8 @@
           categorySeq : undefined,
           isEnd : undefined,
           isUsed : undefined,
-          parentCategoryName : undefined
+          parentCategoryName : undefined,
+          fileName: undefined
         },
         rules: {
           categoryNo: [
@@ -188,7 +215,11 @@
           label: 'label'
         },
         filterCategoryText: '',
-        categoryTreeData: []
+        categoryTreeData: [],
+        dialogImageUrl: '',
+        dialogVisible: false,
+        //图片列表（用于在上传组件中回显图片）
+        fileList: []
       }
     },
     created() {
@@ -279,6 +310,15 @@
       handleUpdate(row) {
         getObj(row.id)
             .then(response => {
+          var fileUrl = response.data.file.fileUrl;
+          console.log(fileUrl)
+          if(fileUrl !== undefined && fileUrl !== ''){
+            var data = {
+              name: '分类',
+              url: response.data.file.fileUrl
+            }
+            this.fileList.push(data)
+          }
           this.form = response.data.obj;
           this.dialogFormVisible = true;
           this.dialogStatus = 'update';
@@ -317,6 +357,8 @@
         const set = this.$refs;
         set[formName].validate(valid => {
           if (valid) {
+            this.form.fileList = this.fileList
+            console.log(this.form)
             addObj(this.form)
               .then(() => {
                 this.dialogFormVisible = false;
@@ -337,6 +379,7 @@
       cancel(formName) {
         this.dialogFormVisible = false;
         const set = this.$refs;
+        this.fileList = [];
         set[formName].resetFields();
       },
       update(formName) {
@@ -344,14 +387,14 @@
         set[formName].validate(valid => {
           if (valid) {
             this.dialogFormVisible = false;
-            this.form.password = undefined;
+            this.form.fileList = this.fileList
             putObj(this.form.pkCategoryId, this.form).then(() => {
               this.dialogFormVisible = false;
               this.getList();
               this.getCategoryTree();
               this.$notify({
                 title: '成功',
-                message: '创建成功',
+                message: '更新成功',
                 type: 'success',
                 duration: 2000
               });
@@ -371,8 +414,98 @@
               categorySeq : undefined,
               isEnd : "SW1001",
               isUsed : "SW1302",
-              parentCategoryName : undefined
+              parentCategoryName : undefined,
+              fileName: undefined
         };
+      },
+      closeDialog() {
+        this.fileList = []
+      },
+      // 自定义上传
+      myUpload(content) {
+        const token = getToken()
+        let self = this
+        let config= {
+          header:{
+            'Content-Type': 'multipart/form-data',
+            'Authorization': token + ',JWT_PLATFORM'
+          },
+          onUploadProgress: progressEvent => {
+            let percent=(progressEvent.loaded / progressEvent.total * 100) | 0
+            //调用onProgress方法来显示进度条，需要传递个对象 percent为进度值
+            content.onProgress({percent:percent})
+          }
+        }
+        let formData = new FormData();
+        formData.append("file", content.file)
+        formData.append("type", "SW1803")
+        formData.append("id", '')
+        
+        axios.post('http://www.allenyll.com:8080/system-web/file/upload', formData, config).then( (res) => {
+          //做处理
+          //this.getFileList(this.goodsId)
+          if(res.data.code === '100000'){
+            var data = {
+              name: '分类',
+              url: res.data.url
+            }
+            this.fileList.push(data)
+            self.uploadMessage = '上传成功！';
+          }
+        }).catch((error) =>{
+
+    
+
+        });
+      },
+      //文件上传成功的钩子函数
+      handleSuccess(res, file) {
+          this.$message({
+              type: 'info',
+              message: '图片上传成功',
+              duration: 6000
+          });
+          if (file.response.success) {
+              this.editor.picture = file.response.message; //将返回的文件储存路径赋值picture字段
+          }
+      },
+      //删除文件之前的钩子函数
+      handleRemove(file, fileList) {
+          this.$message({
+              type: 'info',
+              message: '已删除原有图片',
+              duration: 6000
+          });
+      },
+      //点击列表中已上传的文件事的钩子函数
+      handlePreview(file) {
+        this.dialogImageUrl = file.url;
+        this.dialogVisible = true;
+      },
+      //上传的文件个数超出设定时触发的函数
+      onExceed(files, fileList) {
+          this.$message({
+              type: 'info',
+              message: '最多只能上传一个图片',
+              duration: 6000
+          });
+      },
+      //文件上传前的前的钩子函数
+      //参数是上传的文件，若返回false，或返回Primary且被reject，则停止上传
+      beforeUpload(file) {
+          const isJPG = file.type === 'image/jpeg';
+          const isGIF = file.type === 'image/gif';
+          const isPNG = file.type === 'image/png';
+          const isBMP = file.type === 'image/bmp';
+          const isLt2M = file.size / 1024 / 1024 < 2;
+
+          if (!isJPG && !isGIF && !isPNG && !isBMP) {
+              this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!');
+          }
+          if (!isLt2M) {
+              this.$message.error('上传图片大小不能超过 2MB!');
+          }
+          return (isJPG || isBMP || isGIF || isPNG) && isLt2M;
       }
     }
   }

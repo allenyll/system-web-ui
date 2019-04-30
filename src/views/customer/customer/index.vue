@@ -24,6 +24,11 @@
           <span>{{ scope.row.pkCustomerId }}</span>
         </template>
       </el-table-column>
+      <el-table-column align="center" label="头像">
+        <template scope="scope">
+            <img :src="scope.row.avatarUrl"  min-width="50" height="50" />
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="姓名">
         <template scope="scope">
           <span>{{ scope.row.customerName }}</span>
@@ -49,7 +54,7 @@
           <span>{{ scope.row.status | statusFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="性别">
+      <el-table-column align="center" label="性别" width="60px">
         <template scope="scope">
           <span>{{ scope.row.gender | sexFilter }}</span>
         </template>

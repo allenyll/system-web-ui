@@ -36,7 +36,7 @@
         <el-option key="" label="全部" value=""> </el-option>
         <el-option key="SW1401" label="上架" value="SW1401"> </el-option>
         <el-option key="SW1402" label="下架" value="SW1402"> </el-option>
-        <el-option key="SW1403" label="预售" value="SW1403"> </el-option>>
+        <el-option key="SW1403" label="预售" value="SW1403"> </el-option>
       </el-select>
       <el-button class="filter-item" type="primary" icon="search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" v-if="goodsManager_btn_add" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">添加</el-button>
@@ -49,6 +49,11 @@
           <el-table-column align="center" label="pk_goods_id" v-if="show">
             <template scope="scope">
               <span>{{scope.row.pkGoodsId}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="图片">
+            <template scope="scope">
+                <img :src="scope.row.fileUrl"  min-width="50" height="50" />
             </template>
           </el-table-column>
           <el-table-column  align="center" label="商品名称">
@@ -579,7 +584,7 @@
         formData.append("type", "SW1801")
         formData.append("id", this.goodsId)
         
-        axios.post('http://localhost:8080/system-web/file/upload', formData, config).then( (res) => {
+        axios.post('http://www.allenyll.com:8080/system-web/file/upload', formData, config).then( (res) => {
           //做处理
           this.getFileList(this.goodsId)
           if(res.data.code === '100000'){
@@ -760,7 +765,7 @@
               this.getList();
               this.$notify({
                 title: '成功',
-                message: '创建成功',
+                message: '更新成功',
                 type: 'success',
                 duration: 2000
               });
