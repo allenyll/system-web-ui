@@ -6,8 +6,15 @@
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button v-if="dictManager_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
     </div>
-    <el-table v-loading.body="listLoading" :key="tableKey" :data="list" border fit 
-      :default-sort = "{prop: 'code', order: 'ascending'}" highlight-current-row style="width: 100%">
+    <el-table
+      v-loading.body="listLoading"
+      :key="tableKey"
+      :data="list"
+      :default-sort = "{prop: 'code', order: 'ascending'}"
+      border
+      fit
+      highlight-current-row
+      style="width: 100%">
       <el-table-column v-if="show" align="center" label="ID">
         <template scope="scope">
           <span>{{ scope.row.pkDictId }}</span>
@@ -42,7 +49,7 @@
         <el-button size="small" type="info" icon="el-icon-plus" @click="handleAddChild(scope.row)">添加子项
         </el-button>
         <router-link :to="{ path:'/sys/dict/edit',query: {id:scope.row.pkDictId} }">
-            <el-button v-if="dictManager_btn_edit" type="success" size="small" icon="el-icon-edit">编辑</el-button>
+          <el-button v-if="dictManager_btn_edit" type="success" size="small" icon="el-icon-edit">编辑</el-button>
         </router-link>
         <el-button v-if="dictManager_btn_del" size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除
         </el-button>
@@ -62,8 +69,10 @@
         <el-form-item label="父字典" prop="parentId">
           <el-select v-model="form.parentId" filterable placeholder="请选择">
             <el-option
-              v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
@@ -71,7 +80,7 @@
           <el-radio v-model="form.status" label="SW1302">启用</el-radio>
         </el-form-item>
         <el-form-item label="说明" prop="description">
-          <el-input type="textarea" v-model="form.description"/>
+          <el-input v-model="form.description" type="textarea"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -84,7 +93,7 @@
 </template>
 
 <script>
-import { page, addObj, getObj, delObj, putObj, getParent} from '@/api/admin/dict/index'
+import { page, addObj, getObj, delObj, putObj, getParent } from '@/api/admin/dict/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'Dict',
@@ -92,10 +101,10 @@ export default {
     'child-dict': () => import('./components/childDict')
   },
   filters: {
-    statusFilter: function(val){
+    statusFilter: function(val) {
       const map = {
-        'SW1301' : '停用',
-        'SW1302' : '启用'
+        'SW1301': '停用',
+        'SW1302': '启用'
       }
       return map[val]
     }
@@ -144,7 +153,8 @@ export default {
         limit: 10,
         like_name: '',
         eq_code: '',
-        eq_parent_id: '0'
+        eq_parent_id: '0',
+        order: 'code'
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -158,6 +168,11 @@ export default {
       tableKey: 0
     }
   },
+  computed: {
+    ...mapGetters([
+      'elements'
+    ])
+  },
   watch: {
   },
   created() {
@@ -166,11 +181,6 @@ export default {
     this.dictManager_btn_edit = this.elements['sys:dict:edit']
     this.dictManager_btn_del = this.elements['sys:dict:delete']
     this.dictManager_btn_add = this.elements['sys:dict:add']
-  },
-  computed: {
-    ...mapGetters([
-      'elements'
-    ])
   },
   methods: {
     getList() {
@@ -184,16 +194,15 @@ export default {
     },
     getParentDict() {
       getParent()
-        .then (response => {
-          var dataList = response.data.list;
-          for(var i=0; i < dataList.length; i++){
+        .then(response => {
+          var dataList = response.data.list
+          for (var i = 0; i < dataList.length; i++) {
             var dict = {
               label: dataList[i].name,
               value: dataList[i].pkDictId
             }
-            this.options.push(dict);
+            this.options.push(dict)
           }
-
         })
     },
     handleFilter() {

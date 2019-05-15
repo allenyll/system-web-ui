@@ -13,7 +13,7 @@
       <BookTypeOption v-model="bookType" />
       <el-button :loading="downloadLoading" style="margin:0 0 20px 20px;" type="primary" icon="document" @click="handleDownload">导出</el-button>
     </div>
-    <el-table v-loading.body="listLoading" element-loading-text="拼命加载中" :key="tableKey" :data="list" border fit highlight-current-row style="width: 100%">
+    <el-table v-loading.body="listLoading" :key="tableKey" :data="list" element-loading-text="拼命加载中" border fit highlight-current-row style="width: 100%">
       <el-table-column align="center" label="序号">
         <template slot-scope="scope">
           {{ scope.$index }}
@@ -26,7 +26,7 @@
       </el-table-column>
       <el-table-column align="center" label="头像">
         <template scope="scope">
-            <img :src="scope.row.avatarUrl"  min-width="50" height="50" />
+          <img :src="scope.row.avatarUrl" min-width="50" height="50" >
         </template>
       </el-table-column>
       <el-table-column align="center" label="姓名">
@@ -59,13 +59,13 @@
           <span>{{ scope.row.gender | sexFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作"> 
+      <el-table-column align="center" label="操作">
         <template scope="scope">
-            <el-button v-if="customerManager_btn_edit" size="small" type="success" icon="el-icon-edit" @click="handleUpdate(scope.row)">查看
-            </el-button>
-            <!-- <el-button v-if="customerManager_btn_del" size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除
+          <el-button v-if="customerManager_btn_edit" size="small" type="success" icon="el-icon-edit" @click="handleUpdate(scope.row)">查看
+          </el-button>
+          <!-- <el-button v-if="customerManager_btn_del" size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除
             </el-button> -->
-        </template> 
+        </template>
       </el-table-column>
     </el-table>
     <div v-show="!listLoading" class="pagination-container">
@@ -81,8 +81,8 @@
           <el-input v-else v-model="form.customerAccount" placeholder="请输入账户" disabled/>
         </el-form-item>
         <el-form-item label="状态" placeholder="请选择状态" prop="status" disabled>
-          <el-radio disabled v-model="form.status" label="SW0001">启用</el-radio>
-          <el-radio disabled v-model="form.status" label="SW0002">冻结</el-radio>
+          <el-radio v-model="form.status" disabled label="SW0001">启用</el-radio>
+          <el-radio v-model="form.status" disabled label="SW0002">冻结</el-radio>
         </el-form-item>
         <el-form-item label="性别">
           <el-select v-model="form.gender" class="filter-item" placeholder="请选择" disabled>
@@ -107,7 +107,6 @@
 
 <script>
 import { page, addObj, getObj, delObj, putObj } from '@/api/customer/customer/index'
-import { getDepotTree } from '@/api/admin/depot/index'
 import { mapGetters } from 'vuex'
 
 import FilenameOption from '@/components/excel/FilenameOption'
@@ -118,17 +117,17 @@ export default {
   name: 'Customer',
   components: { FilenameOption, BookTypeOption, AutoWidthOption },
   filters: {
-    sexFilter: function(val){
+    sexFilter: function(val) {
       const map = {
-        'SW0201' : '男',
-        'SW0200' : '女'
+        'SW0201': '男',
+        'SW0200': '女'
       }
       return map[val]
     },
-    statusFilter: function(val){
+    statusFilter: function(val) {
       const map = {
-        'SW0001' : '启用',
-        'SW0002' : '冻结'
+        'SW0001': '启用',
+        'SW0002': '冻结'
       }
       return map[val]
     }
@@ -207,8 +206,13 @@ export default {
       downloadLoading: false,
       filename: '',
       bookType: 'xlsx',
-      autoWidth: true,
+      autoWidth: true
     }
+  },
+  computed: {
+    ...mapGetters([
+      'elements'
+    ])
   },
   watch: {
   },
@@ -217,11 +221,6 @@ export default {
     this.customerManager_btn_edit = this.elements['customer:customer:edit']
     this.customerManager_btn_del = this.elements['customer:customer:delete']
     this.customerManager_btn_add = this.elements['customer:customer:add']
-  },
-  computed: {
-    ...mapGetters([
-      'elements'
-    ])
   },
   methods: {
     getList() {
@@ -340,15 +339,15 @@ export default {
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
-        if(j === 'gender'){
+        if (j === 'gender') {
           console.log(v[j])
-          if(v[j] === 'SW0200'){
+          if (v[j] === 'SW0200') {
             return '女'
-          }else{
+          } else {
             return '男'
           }
-        }else{
-          return v[j]        
+        } else {
+          return v[j]
         }
       }))
     },

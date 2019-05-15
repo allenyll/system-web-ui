@@ -198,29 +198,59 @@ export const asyncRouterMap = [
         meta: { title: '品牌管理', icon: 'sw-brand', noCache: true, perms: 'goods:brand:list' }
       },
       {
-        path: 'colorGroup',
-        component: () => import('@/views/goods/colorGroup/index'),
-        name: '颜色分组',
-        meta: { title: '颜色分组', icon: 'sw-group', perms: 'goods:colorGroup:list', noCache: true }
+        path: 'attributes',
+        component: () => import('@/views/goods/attributes/index'),
+        name: '属性管理',
+        meta: { title: '属性管理', icon: 'sw-attr', noCache: true, perms: 'goods:attributes:list' }
       },
       {
-        path: 'color',
-        component: () => import('@/views/goods/color/index'),
-        name: '颜色管理',
-        meta: { title: '颜色管理', icon: 'sw-color', perms: 'goods:color:list', noCache: true }
+        path: 'attrOption',
+        component: () => import('@/views/goods/attrOption/index'),
+        name: '属性选项',
+        meta: { title: '属性选项', icon: 'sw-attr', noCache: true, perms: 'goods:attrOption:list' }
       },
       {
-        path: 'sizeGroup',
-        component: () => import('@/views/goods/sizeGroup/index'),
-        name: '尺码分组',
-        meta: { title: '尺码分组', icon: 'sw-group', perms: 'goods:sizeGroup:list', noCache: true }
+        path: 'specsGroup',
+        component: () => import('@/views/goods/specsGroup/index'),
+        name: '规格组',
+        meta: { title: '规格组', icon: 'sw-group', noCache: true, perms: 'goods:specsGroup:list' }
       },
       {
-        path: 'size',
-        component: () => import('@/views/goods/size/index'),
-        name: '尺码管理',
-        meta: { title: '尺码管理', icon: 'sw-size', perms: 'goods:size:list', noCache: true }
+        path: 'specs',
+        component: () => import('@/views/goods/specs/index'),
+        name: '规格管理',
+        meta: { title: '规格管理', icon: 'sw-spec', noCache: true, perms: 'goods:specs:list' }
       },
+      {
+        path: 'specOption',
+        component: () => import('@/views/goods/specOption/index'),
+        name: '规格选项',
+        meta: { title: '规格选项', icon: 'sw-spec', noCache: true, perms: 'goods:specOption:list' }
+      },
+      // {
+      //   path: 'colorGroup',
+      //   component: () => import('@/views/goods/colorGroup/index'),
+      //   name: '颜色分组',
+      //   meta: { title: '颜色分组', icon: 'sw-group', perms: 'goods:colorGroup:list', noCache: true }
+      // },
+      // {
+      //   path: 'color',
+      //   component: () => import('@/views/goods/color/index'),
+      //   name: '颜色管理',
+      //   meta: { title: '颜色管理', icon: 'sw-color', perms: 'goods:color:list', noCache: true }
+      // },
+      // {
+      //   path: 'sizeGroup',
+      //   component: () => import('@/views/goods/sizeGroup/index'),
+      //   name: '尺码分组',
+      //   meta: { title: '尺码分组', icon: 'sw-group', perms: 'goods:sizeGroup:list', noCache: true }
+      // },
+      // {
+      //   path: 'size',
+      //   component: () => import('@/views/goods/size/index'),
+      //   name: '尺码管理',
+      //   meta: { title: '尺码管理', icon: 'sw-size', perms: 'goods:size:list', noCache: true }
+      // },
       {
         path: 'category',
         component: () => import('@/views/goods/category/index'),

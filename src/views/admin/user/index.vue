@@ -130,17 +130,17 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'User',
   filters: {
-    statusFilter: function(val){
+    statusFilter: function(val) {
       const map = {
-        'SW0001' : '启用',
-        'SW0002' : '冻结'
+        'SW0001': '启用',
+        'SW0002': '冻结'
       }
       return map[val]
     },
-    sexFilter: function(val){
+    sexFilter: function(val) {
       const map = {
-        'SW0200' : '女',
-        'SW0201' : '男'
+        'SW0200': '女',
+        'SW0201': '男'
       }
       return map[val]
     }
@@ -249,6 +249,11 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters([
+      'elements'
+    ])
+  },
   watch: {
     filterDepotText(val) {
       this.$refs.depotTree.filter(val)
@@ -261,11 +266,6 @@ export default {
     this.userManager_btn_del = this.elements['sys:user:delete']
     this.userManager_btn_add = this.elements['sys:user:add']
     this.userManager_btn_config_role = this.elements['sys:user:configRole']
-  },
-  computed: {
-    ...mapGetters([
-      'elements'
-    ])
   },
   methods: {
     getList() {
@@ -356,7 +356,7 @@ export default {
       getRoleList(row.pkUserId).then(response => {
         const roles = response.data.roleList
         const data = []
-        if (roles != undefined && roles.length > 0) {
+        if (roles !== undefined && roles.length > 0) {
           for (var i = 0; i < roles.length; i++) {
             data.push({
               label: roles[i].roleName,
@@ -366,7 +366,7 @@ export default {
         }
         this.roleList = data
         const userRole = response.data.userRole
-        if (userRole != '') {
+        if (userRole !== '') {
           this.role.push(
             userRole.pkRoleId
           )

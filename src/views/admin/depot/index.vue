@@ -139,13 +139,6 @@ export default {
       depotTreeData: []
     }
   },
-  created() {
-    this.getList()
-    this.getDepotTreeList()
-    this.depot_btn_add = this.elements['sys:depot:add']
-    this.depot_btn_edit = this.elements['sys:depot:edit']
-    this.depot_btn_del = this.elements['sys:depot:delete']
-  },
   computed: {
     ...mapGetters([
       'elements'
@@ -155,6 +148,13 @@ export default {
     filterDepotText(val) {
       this.$refs.depotTree.filter(val)
     }
+  },
+  created() {
+    this.getList()
+    this.getDepotTreeList()
+    this.depot_btn_add = this.elements['sys:depot:add']
+    this.depot_btn_edit = this.elements['sys:depot:edit']
+    this.depot_btn_del = this.elements['sys:depot:delete']
   },
   methods: {
     getList() {

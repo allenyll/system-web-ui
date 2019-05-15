@@ -137,7 +137,7 @@ export default {
         },
         {
           'name': 'snu',
-          'value': 't_snu_'
+          'value': 'snu_'
         }
       ],
     }

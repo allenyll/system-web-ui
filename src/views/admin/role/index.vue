@@ -74,10 +74,10 @@
             show-checkbox
             check-strictly>
 
-            <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span slot-scope="{ node, data }" class="custom-tree-node">
               <span>
-                  <i><svg-icon :icon-class="node.icon"></svg-icon></i>&nbsp;{{ node.label }}
-              </span>              
+                <i><svg-icon :icon-class="node.icon"/></i>&nbsp;{{ node.label }}
+              </span>
             </span>
           </el-tree>
         </el-col>
@@ -147,6 +147,11 @@ export default {
       configRoleId: ''
     }
   },
+  computed: {
+    ...mapGetters([
+      'elements'
+    ])
+  },
   watch: {
 
   },
@@ -157,11 +162,6 @@ export default {
     this.role_btn_del = this.elements['sys:role:delete']
     this.role_btn_add = this.elements['sys:role:add']
     this.role_btn_config_menu = this.elements['sys:role:configMenu']
-  },
-  computed: {
-    ...mapGetters([
-      'elements'
-    ])
   },
   methods: {
     getList() {

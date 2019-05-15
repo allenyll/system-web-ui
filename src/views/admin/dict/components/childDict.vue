@@ -3,78 +3,80 @@
     <el-col>
       <el-card>
         <div slot="header" class="clearfix">
-            <span>编辑字典</span>
-            <el-button style="float: right;" size="small" type="primary" @click="update('form')">保存</el-button>
+          <span>编辑字典</span>
+          <el-button style="float: right;" size="small" type="primary" @click="update('form')">保存</el-button>
         </div>
         <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-            <el-form-item label="名称" prop="name">
+          <el-form-item label="名称" prop="name">
             <el-input v-model="form.name" placeholder="请输入名称"/>
-            </el-form-item>
-            <el-form-item label="编码" prop="code">
+          </el-form-item>
+          <el-form-item label="编码" prop="code">
             <el-input v-model="form.code" placeholder="请输入编码"/>
-            </el-form-item>
-            <el-form-item label="父字典" prop="parentId">
+          </el-form-item>
+          <el-form-item label="父字典" prop="parentId">
             <el-select v-model="form.parentId" filterable placeholder="请选择">
-                <el-option
-                v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                </el-option>
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"/>
             </el-select>
-            </el-form-item>
-            <el-form-item label="状态" prop="status">
+          </el-form-item>
+          <el-form-item label="状态" prop="status">
             <el-radio v-model="form.status" label="SW1301">停用</el-radio>
             <el-radio v-model="form.status" label="SW1302">启用</el-radio>
-            </el-form-item>
-            <el-form-item label="说明" prop="description">
-            <el-input type="textarea" v-model="form.description"/>
-            </el-form-item>
+          </el-form-item>
+          <el-form-item label="说明" prop="description">
+            <el-input v-model="form.description" type="textarea"/>
+          </el-form-item>
         </el-form>
       </el-card>
       <el-card v-if="showChild">
         <div slot="header" class="clearfix">
-            <span>字典子项列表</span>
+          <span>字典子项列表</span>
         </div>
-        <el-table v-loading.body="listLoading" :key="tableKey" :data="list" border fit :default-sort = "{prop: 'code', order: 'ascending'}" highlight-current-row style="width: 100%">
-            <el-table-column v-if="show" align="center" label="ID" width="0">
-                <template scope="scope">
-                <span>{{ scope.row.pkDictId }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column align="center" label="名称">
-                <template scope="scope">
-                <span>{{ scope.row.name }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column align="center" sortable label="编码" prop="code">
-                <template scope="scope">
-                <span>{{ scope.row.code }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column align="center" label="状态">
-                <template scope="scope">
-                <span>{{ scope.row.status | statusFilter }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column align="center" label="说明">
-                <template scope="scope">
-                <span>{{ scope.row.description }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column align="center" label="创建时间" prop="addTime">
-                <template scope="scope">
-                <span>{{ scope.row.addTime }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column align="center" label="操作" width="300"> <template scope="scope">
-              <el-button type="success" size="small" icon="el-icon-edit" @click="handleUpdateChild(scope.row)">编辑</el-button>
-              <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDeleteChild(scope.row)">删除
-              </el-button>
-            </template> 
+        <el-table v-loading.body="listLoading" :key="tableKey" :data="list" :default-sort = "{prop: 'code', order: 'ascending'}" border fit highlight-current-row style="width: 100%">
+          <el-table-column v-if="show" align="center" label="ID" width="0">
+            <template scope="scope">
+              <span>{{ scope.row.pkDictId }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="名称">
+            <template scope="scope">
+              <span>{{ scope.row.name }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" sortable label="编码" prop="code">
+            <template scope="scope">
+              <span>{{ scope.row.code }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="状态">
+            <template scope="scope">
+              <span>{{ scope.row.status | statusFilter }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="说明">
+            <template scope="scope">
+              <span>{{ scope.row.description }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="创建时间" prop="addTime">
+            <template scope="scope">
+              <span>{{ scope.row.addTime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="操作" width="300"> <template scope="scope">
+            <el-button type="success" size="small" icon="el-icon-edit" @click="handleUpdateChild(scope.row)">编辑</el-button>
+            <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDeleteChild(scope.row)">删除
+            </el-button>
+          </template>
           </el-table-column>
         </el-table>
       </el-card>
     </el-col>
 
-    <el-dialog title="编辑子项字典" :visible.sync="dialogFormVisible">
+    <el-dialog :visible.sync="dialogFormVisible" title="编辑子项字典">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入名称"/>
@@ -85,8 +87,10 @@
         <el-form-item label="父字典" prop="parentId">
           <el-select v-model="form.parentId" filterable placeholder="请选择">
             <el-option
-              v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
@@ -94,7 +98,7 @@
           <el-radio v-model="form.status" label="SW1302">启用</el-radio>
         </el-form-item>
         <el-form-item label="说明" prop="description">
-          <el-input type="textarea" v-model="form.description"/>
+          <el-input v-model="form.description" type="textarea"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -106,16 +110,15 @@
 </template>
 
 <script>
-import { page, addObj, getObj, delObj, putObj, getParent, getChild} from '@/api/admin/dict/index'
-import { mapGetters } from 'vuex'
+import { getObj, delObj, putObj, getParent, getChild } from '@/api/admin/dict/index';
 export default {
-  name: 'childDict',
+  name: 'ChildDict',
   filters: {
-    statusFilter: function(val){
+    statusFilter: function(val) {
       console.log(val)
       const statusMap = {
-        'SW1301' : '停用',
-        'SW1302' : '启用'
+        'SW1301': '停用',
+        'SW1302': '启用'
       }
       return statusMap[val]
     }
@@ -165,6 +168,8 @@ export default {
       showChild: false
     }
   },
+  computed: {
+  },
   watch: {
   },
   created() {
@@ -173,32 +178,29 @@ export default {
     this.getChildList(this.dictId)
     this.getParentDict()
   },
-  computed: {
-  },
   methods: {
     getParentDict() {
       getParent()
-        .then (response => {
-          var dataList = response.data.list;
-          for(var i=0; i < dataList.length; i++){
+        .then(response => {
+          var dataList = response.data.list
+          for (var i = 0; i < dataList.length; i++) {
             var dict = {
               label: dataList[i].name,
               value: dataList[i].pkDictId
             }
-            this.options.push(dict);
+            this.options.push(dict)
           }
-
         })
     },
     getChildList(id) {
-        getChild(id).then( response => {
-          const size = response.data.list;
-          if(response.data.list.length > 0){
-              this.showChild = true
-          }
-          this.list = response.data.list
-          this.listLoading = false
-        })
+      getChild(id).then(response => {
+        const size = response.data.list
+        if (response.data.list.length > 0) {
+          this.showChild = true
+        }
+        this.list = response.data.list
+        this.listLoading = false
+      })
     },
     getObj(id) {
       getObj(id)
@@ -234,7 +236,7 @@ export default {
           this.dialogFormVisible = false
           putObj(this.form.pkDictId, this.form).then(() => {
             this.dialogFormVisible = false
-            this.getChildList(this.dictId )
+            this.getChildList(this.dictId)
             this.$notify({
               title: '成功',
               message: '更新成功',
@@ -254,7 +256,7 @@ export default {
           this.dialogFormVisible = true
           this.dialogStatus = 'update'
         })
-    }, 
+    },
     handleDeleteChild(row) {
       this.$confirm('此操作将永久删除, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -270,7 +272,7 @@ export default {
                 type: 'success',
                 duration: 2000
               })
-              this.getChildList(this.dictId )
+              this.getChildList(this.dictId)
             })
         })
     },

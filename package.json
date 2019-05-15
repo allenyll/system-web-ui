@@ -13,8 +13,7 @@
     "precommit": "lint-staged",
     "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml"
   },
-  "lint-staged": {
-  },
+  "lint-staged": {},
   "keywords": [
     "vue",
     "element-ui",
@@ -30,6 +29,7 @@
     "url": "https://github.com/PanJiaChen/vue-element-admin/issues"
   },
   "dependencies": {
+    "@riophae/vue-treeselect": "0.0.38",
     "axios": "0.18.0",
     "clipboard": "1.7.1",
     "codemirror": "5.39.2",

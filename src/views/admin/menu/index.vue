@@ -11,12 +11,19 @@
     <el-row>
       <el-col :span="7" style="margin-top:15px;">
         <el-input v-model="filterText" placeholder="输入关键字进行过滤"/>
-        <el-tree ref="menuTree" :data="treeData"  :props="defaultProps" :filter-node-method="filterNode"
-          class="filter-tree" node-key="id" highlight-current  @node-click="getNodeData">
-          <span class="custom-tree-node" slot-scope="{ node, data }">
+        <el-tree
+          ref="menuTree"
+          :data="treeData"
+          :props="defaultProps"
+          :filter-node-method="filterNode"
+          class="filter-tree"
+          node-key="id"
+          highlight-current
+          @node-click="getNodeData">
+          <span slot-scope="{ node, data }" class="custom-tree-node">
             <span>
-                <i><svg-icon :icon-class="node.icon"></svg-icon></i>&nbsp;{{ node.label }}
-            </span>              
+              <i><svg-icon :icon-class="node.icon"/></i>&nbsp;{{ node.label }}
+            </span>
           </span>
         </el-tree>
       </el-col>
@@ -79,12 +86,21 @@
       <el-row style="margin:0 auto;">
         <el-col :span="15" style="margin-left:30px;">
           <el-input v-model="filterMenuText" placeholder="输入关键字过滤" style="margin-bottom:15px;"/>
-          <el-tree ref="menuTreeDialog" :data="menuTreeData" :props="defaultProps" :filter-node-method="filterNode" class="filter-tree"
-            node-key="id" highlight-current show-checkbox default-expand-all check-strictly>
-            <span class="custom-tree-node" slot-scope="{ node, data }">
+          <el-tree
+            ref="menuTreeDialog"
+            :data="menuTreeData"
+            :props="defaultProps"
+            :filter-node-method="filterNode"
+            class="filter-tree"
+            node-key="id"
+            highlight-current
+            show-checkbox
+            default-expand-all
+            check-strictly>
+            <span slot-scope="{ node, data }" class="custom-tree-node">
               <span>
-                  <i><svg-icon :icon-class="node.icon"></svg-icon></i>&nbsp;{{ node.label }}
-              </span>              
+                <i><svg-icon :icon-class="node.icon"/></i>&nbsp;{{ node.label }}
+              </span>
             </span>
           </el-tree>
         </el-col>
@@ -166,6 +182,11 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters([
+      'elements'
+    ])
+  },
   watch: {
     filterText(val) {
       this.$refs.menuTree.filter(val)
@@ -180,11 +201,6 @@ export default {
     this.menuManager_btn_add = this.elements['sys:menu:add']
     this.menuManager_btn_del = this.elements['sys:menu:delete']
     this.menuManager_btn_edit = this.elements['sys:menu:edit']
-  },
-  computed: {
-    ...mapGetters([
-      'elements'
-    ])
   },
   methods: {
     getList() {
