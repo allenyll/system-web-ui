@@ -3,11 +3,12 @@ import { Message, MessageBox } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
-var baseURLStr = window.g.BASE_API
+// const baseURLStr = window.g.BASE_API
+const baseUrl = process.env.BASE_API
 
 // 创建一个 axios 实例
 const service = axios.create({
-  baseURL: baseURLStr, // api 的 base_url
+  baseURL: baseUrl, // api 的 base_url
   timeout: 5000 // request 超时时间
 })
 
