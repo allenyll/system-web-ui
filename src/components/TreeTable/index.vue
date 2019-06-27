@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="formatData" :row-style="showRow" v-bind="$attrs">
+  <el-table :data="formatData" :row-style="showRow" v-bind="$attrs" row-key="id">
     <el-table-column v-if="columns.length===0" width="150">
       <template slot-scope="scope">
         <span v-for="space in scope.row._level" :key="space" class="ms-tree-space"/>
@@ -19,7 +19,7 @@
           <i v-if="!scope.row._expanded" class="el-icon-plus"/>
           <i v-else class="el-icon-minus"/>
         </span>
-        <img  v-if="column.ifImage === 0" :src="scope.row[column.value]"  min-width="50" height="50" />
+        <img v-if="column.ifImage === 0" :src="scope.row[column.value]" min-width="50" height="50" >
         <span v-if="column.ifImage === '' || column.ifImage === undefined">{{ scope.row[column.value] }}</span>
       </template>
     </el-table-column>
@@ -79,7 +79,7 @@ export default {
     },
     // 图标显示
     iconShow(index, record) {
-      return (index === 0 && record.children && record.children.length > 0)
+      return false // (index === 0 && record.children && record.children.length > 0)
     }
   }
 }

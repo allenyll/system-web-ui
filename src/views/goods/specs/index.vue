@@ -62,7 +62,7 @@
           <el-input v-model="form.specsVal" placeholder="请输入规格值"/>
         </el-form-item>
         <el-form-item label="所属分类" prop="fkCategoryId">
-          <TreeSelect v-model="form.fkCategoryId" :multiple="true" :options="categoryTree" placeholder="请选择分类"/>
+          <TreeSelect v-model="form.fkCategoryId" :flat="true" :default-expand-level="1" :multiple="true" :options="categoryTree" placeholder="请选择分类"/>
         </el-form-item>
         <el-form-item label="规格组" prop="fkSpecsGroupId">
           <el-select v-model="form.fkSpecsGroupId" filterable placeholder="请选择规格组">

@@ -1,4 +1,4 @@
-<template>
+<template xmlns:on-progress="">
   <div class="app-container calendar-list-container">
     <div class="filter-container">
       <el-input v-model="listQuery.like_goods_name" style="width: 190px;" class="filter-item" placeholder="名称" @keyup.enter.native="handleFilter"/>
@@ -15,22 +15,6 @@
         <el-option key="" label="全部" value=""/>
         <el-option
           v-for="item in categoryOptions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"/>
-      </el-select>
-      <el-select v-model="listQuery.eq_fk_color_id" style="width: 190px;" class="filter-item" filterable placeholder="请选择颜色" @keyup.enter.native="handleFilter">
-        <el-option key="" label="全部" value=""/>
-        <el-option
-          v-for="item in colorOptions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"/>
-      </el-select>
-      <el-select v-model="listQuery.eq_fk_size_id" style="width: 190px;" class="filter-item" filterable placeholder="请选择尺码" @keyup.enter.native="handleFilter">
-        <el-option key="" label="全部" value=""/>
-        <el-option
-          v-for="item in sizeOptions"
           :key="item.value"
           :label="item.label"
           :value="item.value"/>
@@ -60,27 +44,19 @@
       </el-table-column>
       <el-table-column align="center" label="图片">
         <template scope="scope">
-          <img :src="scope.row.fileUrl" min-width="50" height="50" >
+          <img :src="scope.row.fileUrl" min-width="120" height="80" >
         </template>
       </el-table-column>
-      <el-table-column align="center" label="商品名称">
+      <el-table-column align="center" width="120" label="商品名称">
         <template scope="scope">
-          <span>{{ scope.row.goodsName }}</span>
+          <p>{{ scope.row.goodsName }}</p>
+          <p>品牌：{{ brandNameMap[scope.row.fkBrandId] }}</p>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="商品编码">
+      <el-table-column align="center" width="150" label="商品价格/编码">
         <template scope="scope">
-          <span>{{ scope.row.goodsCode }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="商品价格">
-        <template scope="scope">
-          <span>{{ scope.row.price }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="品牌">
-        <template scope="scope">
-          <span>{{ brandNameMap[scope.row.fkBrandId] }}</span>
+          <p>￥{{ scope.row.price }}</p>
+          <p>货号：{{ scope.row.goodsCode }}</p>
         </template>
       </el-table-column>
       <el-table-column align="center" label="分类">
@@ -88,39 +64,69 @@
           <span>{{ categoryNameMap[scope.row.fkCategoryId] }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="颜色">
-        <template scope="scope">
-          <span>{{ colorNameMap[scope.row.fkColorId] }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="尺码">
-        <template scope="scope">
-          <span>{{ sizeNameMap[scope.row.fkSizeId] }}</span>
-        </template>
-      </el-table-column>
       <el-table-column align="center" label="库存量">
         <template scope="scope">
           <span>{{ scope.row.stock }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="季节性">
-        <template scope="scope">
-          <span>{{ scope.row.season | seasonFilter }}</span>
+      <el-table-column label="标签" width="140" align="center">
+        <template slot-scope="scope">
+          <p>启用：
+            <el-switch
+              v-model="scope.row.isUsed"
+              active-value="SW1302"
+              inactive-value="SW1301"
+              @change="handleLabel(scope.$index, scope.row.pkGoodsId, scope.row.isUsed, 'isUsed')"/>
+          </p>
+          <p>推荐：
+            <el-switch
+              v-model="scope.row.isRecom"
+              active-value="SW1001"
+              inactive-value="SW1002"
+              @change="handleLabel(scope.$index, scope.row.pkGoodsId, scope.row.isRecom, 'isRecom')"/>
+          </p>
+          <p>规格：
+            <el-switch
+              v-model="scope.row.isSpec"
+              active-value="SW1001"
+              inactive-value="SW1002"
+              @change="handleLabel(scope.$index, scope.row.pkGoodsId, scope.row.isSpec, 'isSpec')"/>
+          </p>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="单位">
-        <template scope="scope">
-          <span>{{ unitMap[scope.row.unit] }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="是否启用">
-        <template scope="scope">
-          <el-tag :type="scope.row.isUsed | isUsedTypeFilter">{{ scope.row.isUsed | isUsedFilter }}</el-tag>
+      <el-table-column label="标签" width="140" align="center">
+        <template slot-scope="scope">
+          <p>精品：
+            <el-switch
+              v-model="scope.row.isBest"
+              active-value="SW1001"
+              inactive-value="SW1002"
+              @change="handleLabel(scope.$index, scope.row.pkGoodsId, scope.row.isBest, 'isBest')"/>
+          </p>
+          <p>热卖：
+            <el-switch
+              v-model="scope.row.isHot"
+              active-value="SW1001"
+              inactive-value="SW1002"
+              @change="handleLabel(scope.$index, scope.row.pkGoodsId, scope.row.isHot, 'isHot')"/>
+          </p>
+          <p>新品：
+            <el-switch
+              v-model="scope.row.isNew"
+              active-value="SW1001"
+              inactive-value="SW1002"
+              @change="handleLabel(scope.$index, scope.row.pkGoodsId, scope.row.isNew, 'isNew')"/>
+          </p>
         </template>
       </el-table-column>
       <el-table-column align="center" label="商品状态">
         <template scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="SKU库存" width="100" align="center">
+        <template slot-scope="scope">
+          <el-button type="primary" icon="el-icon-edit" circle @click="showSkuStockDialog(scope.$index, scope.row)"/>
         </template>
       </el-table-column>
       <el-table-column fixed="right" align="center" label="操作" width="150px">
@@ -135,6 +141,65 @@
     <div v-show="!listLoading" class="pagination-container">
       <el-pagination :current-page.sync="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
+    <el-dialog
+      :visible.sync="skuStockForm.dialogVisible"
+      title="编辑货品信息"
+      width="60%">
+      <span>商品货号：</span>
+      <span>{{ skuStockForm.goodsCode }}</span>
+      <el-input v-model="skuStockForm.keyword" placeholder="按sku编号搜索" size="small" style="width: 50%;margin-left: 20px">
+        <el-button slot="append" icon="el-icon-search" @click="handleSearchEditSku"/>
+      </el-input>
+      <el-table
+        :data="skuStockForm.stockList"
+        style="width: 100%;margin-top: 20px"
+        border>
+        <el-table-column
+          label="SKU编号"
+          align="center">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.skuCode"/>
+          </template>
+        </el-table-column>
+        <el-table-column
+          v-for="(item,index) in skuStockForm.specList"
+          :label="item"
+          :key="item"
+          align="center">
+          <template slot-scope="scope">
+            {{ getSpecs(scope.row, index) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="销售价格"
+          width="100"
+          align="center">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.skuPrice"/>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="商品库存"
+          width="80"
+          align="center">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.skuStock"/>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="库存预警值"
+          width="100"
+          align="center">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.warnStock"/>
+          </template>
+        </el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="skuStockForm.dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="updateSkuStock">确 定</el-button>
+      </span>
+    </el-dialog>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" @close="closeDialog">
       <el-tabs v-model="activeName" type="border-card">
         <el-tab-pane label="商品基础信息" name="first">
@@ -409,7 +474,8 @@
 </template>
 
 <script>
-import { page, addObj, getObj, delObj, putObj } from '@/api/goods/goods/index'
+import { page, addObj, delObj, putObj, updateLabel } from '@/api/goods/goods/index'
+import { getSkuStockList, updateSkuStock } from '@/api/goods/sku/index'
 import { getFileList, delFile } from '@/api/admin/file/index'
 import { getBrandList } from '@/api/goods/brand/index'
 import { getSizeList } from '@/api/goods/size/index'
@@ -474,6 +540,14 @@ export default {
   },
   data() {
     return {
+      skuStockForm: {
+        dialogVisible: false,
+        goodsId: null,
+        goodsCode: '',
+        stockList: [],
+        specList: [],
+        keyword: null
+      },
       form: {
         fkBrandId: undefined,
         fkCategoryId: undefined,
@@ -606,8 +680,14 @@ export default {
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 20,
-        name: undefined
+        limit: 10,
+        name: undefined,
+        like_goods_name: '',
+        eq_goods_code: '',
+        eq_fk_brand_id: '',
+        eq_fk_category_id: '',
+        eq_is_used: '',
+        eq_status: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -644,12 +724,6 @@ export default {
     ]),
     brandNameMap: function() {
       return this.brandMap
-    },
-    sizeNameMap: function() {
-      return this.sizeMap
-    },
-    colorNameMap: function() {
-      return this.colorMap
     },
     categoryNameMap: function() {
       return this.categoryMap
@@ -806,15 +880,16 @@ export default {
       this.$refs.tinymce.setContent(this.form.goodsDesc)
     },
     handleUpdate(row) {
-      this.goodsId = row.pkGoodsId
-      this.getFileList(this.goodsId)
-      getObj(row.pkGoodsId)
-        .then(response => {
-          this.form = response.data.obj
-          this.dialogFormVisible = true
-          this.dialogStatus = 'update'
-          this.$refs.tinymce.setContent(this.form.goodsDesc)
-        })
+      this.$router.push({ path: '/goods/updateGoods', query: { id: row.pkGoodsId }})
+      // this.goodsId = row.pkGoodsId
+      // this.getFileList(this.goodsId)
+      // getObj(row.pkGoodsId)
+      //   .then(response => {
+      //     this.form = response.data.obj
+      //     this.dialogFormVisible = true
+      //     this.dialogStatus = 'update'
+      //     this.$refs.tinymce.setContent(this.form.goodsDesc)
+      //   })
     },
     handleDelete(row) {
       this.$confirm('此操作将永久删除, 是否继续?', '提示', {
@@ -881,6 +956,70 @@ export default {
           return false
         }
       })
+    },
+    handleLabel(index, id, status, label) {
+      const params = {
+        id: id,
+        label: label,
+        status: status
+      }
+      updateLabel(params).then(res => {
+        this.$message({
+          message: '修改成功',
+          type: 'success',
+          duration: 1000
+        })
+      })
+    },
+    getSpecs(row, index) {
+      if (index === 0) {
+        return row.value0
+      } else if (index === 1) {
+        return row.value1
+      } else {
+        return row.value2
+      }
+    },
+    handleSearchEditSku() {
+      getSkuStockList(this.skuStockForm.goodsId, { keyword: this.skuStockForm.keyword }).then(response => {
+        this.skuStockForm.specList = response.data.specList
+        this.skuStockForm.stockList = response.data.stockList
+      })
+    },
+    showSkuStockDialog(index, row) {
+      this.skuStockForm.dialogVisible = true
+      this.skuStockForm.goodsId = row.pkGoodsId
+      this.skuStockForm.goodsCode = row.goodsCode
+      this.skuStockForm.keyword = null
+      getSkuStockList(row.pkGoodsId, { keyword: this.skuStockForm.keyword }).then(response => {
+        this.skuStockForm.specList = response.data.specList
+        this.skuStockForm.stockList = response.data.stockList
+      })
+    },
+    updateSkuStock() {
+      if (this.skuStockForm.stockList == null || this.skuStockForm.stockList.length <= 0) {
+        this.$message({
+          message: '暂无sku信息',
+          type: 'warning',
+          duration: 1000
+        })
+        return
+      }
+      this.$confirm('是否要进行修改', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        updateSkuStock(this.skuStockForm.goodsId, this.skuStockForm.stockList).then(response => {
+          this.$message({
+            message: '修改成功',
+            type: 'success',
+            duration: 1000
+          })
+          this.skuStockForm.dialogVisible = false
+        })
+      })
+      console.log('updateSkuStock')
     },
     resetTemp() {
       this.form = {

@@ -3,10 +3,10 @@ import request from '@/utils/request'
 const path = '/system-web/sku/'
 
 export function list() {
-    return request({
-        url: path + 'list',
-        method: 'post'
-    })
+  return request({
+    url: path + 'list',
+    method: 'post'
+  })
 }
 
 export function page(query) {
@@ -47,5 +47,21 @@ export function putObj(id, obj) {
     url: path + id,
     method: 'put',
     data: obj
+  })
+}
+
+export function getSkuStockList(id, params) {
+  return request({
+    url: path + 'getSkuStockList/' + id,
+    method: 'post',
+    data: params
+  })
+}
+
+export function updateSkuStock(id, params) {
+  return request({
+    url: path + 'updateSkuStock/' + id,
+    method: 'post',
+    data: params
   })
 }

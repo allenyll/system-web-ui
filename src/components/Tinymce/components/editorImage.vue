@@ -23,7 +23,6 @@
 
 <script>
 import { getToken } from '@/utils/auth'
-import { upload, download, getFileList, delFile } from '@/api/admin/file/index';
 import axios from 'axios'
 export default {
   name: 'EditorSlideUpload',
@@ -43,39 +42,36 @@ export default {
   methods: {
     myUpload(content) {
       const token = getToken()
-      let self = this
-      let config= {
-        header:{
+      const config = {
+        header: {
           'Content-Type': 'multipart/form-data',
           'Authorization': token + ',JWT_PLATFORM'
         }
       }
-      let formData = new FormData();
-      formData.append("file", content.file)
-      formData.append("type", "SW1803")
-      formData.append("id", "0")
-      
-      axios.post('http://localhost:8080/system-web/file/upload', formData, config).then( (res) => {
-        //做处理
-        if(res.data.code === '100000'){
+      const formData = new FormData()
+      formData.append('file', content.file)
+      formData.append('type', 'SW1803')
+      formData.append('id', '0')
+
+      axios.post('http://localhost:8080/system-web/cosFile/upload', formData, config).then((res) => {
+        // 做处理
+        if (res.data.code === '100000') {
           const uid = content.file.uid
           console.log(uid)
           const objKeyArr = Object.keys(this.listObj)
           console.log(objKeyArr)
           for (let i = 0, len = objKeyArr.length; i < len; i++) {
             if (this.listObj[objKeyArr[i]].uid === uid) {
-              this.fileList.push({url:res.data.url})
+              this.fileList.push({ url: res.data.url })
               this.listObj[objKeyArr[i]].url = res.data.url
               this.listObj[objKeyArr[i]].hasSuccess = true
               return
             }
           }
         }
-      }).catch((error) =>{
-
-  
-
-      });
+      }).catch((error) => {
+        console.log(error)
+      })
     },
     checkAllSuccess() {
       return Object.keys(this.listObj).every(item => this.listObj[item].hasSuccess)
@@ -123,7 +119,7 @@ export default {
 .editor-slide-upload {
   margin-bottom: 20px;
   /deep/ .el-upload--picture-card {
-    width: 100%;
+    width: 22%;
   }
 }
 </style>

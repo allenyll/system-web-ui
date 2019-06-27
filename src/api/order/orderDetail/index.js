@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 
-const path = '/system-web/goods/'
+const path = '/system-web/orderDetail/'
+
+export function list() {
+    return request({
+        url: path + 'list',
+        method: 'post'
+    })
+}
 
 export function page(query) {
   return request({
@@ -30,7 +37,7 @@ export function delObj(id, obj) {
     url: path + id,
     method: 'delete',
     params: {
-      eq_pk_goods_id: id
+      eq_pk_order_detail_id: id
     }
   })
 }
@@ -40,29 +47,5 @@ export function putObj(id, obj) {
     url: path + id,
     method: 'put',
     data: obj
-  })
-}
-
-export function updateLabel(params) {
-  return request({
-    url: path + 'updateLabel',
-    method: 'post',
-    data: params
-  })
-}
-
-export function createGoods(param) {
-  return request({
-    url: path + 'createGoods',
-    method: 'post',
-    data: param
-  })
-}
-
-export function updateGoods(id, param) {
-  return request({
-    url: path + 'updateGoods/' + id,
-    method: 'post',
-    data: param
   })
 }

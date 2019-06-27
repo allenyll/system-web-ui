@@ -2,11 +2,11 @@ import request from '@/utils/request'
 
 const path = '/system-web/specOption/'
 
-export function list() {
-    return request({
-        url: path + 'list',
-        method: 'post'
-    })
+export function getSpecOptionList() {
+  return request({
+    url: path + 'list',
+    method: 'post'
+  })
 }
 
 export function page(query) {

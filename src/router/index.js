@@ -181,6 +181,12 @@ export const asyncRouterMap = [
         component: () => import('@/views/customer/balance/index'),
         name: '余额管理',
         meta: { title: '余额管理', icon: 'sw-balance', perms: 'customer:balance:list', noCache: true }
+      },
+      {
+        path: 'customerLevel',
+        component: () => import('@/views/customer/customerLevel/index'),
+        name: '会员等级',
+        meta: { title: '会员等级', icon: 'sw-level', perms: 'customer:customerLevel:list', noCache: true }
       }
     ]
   },
@@ -262,7 +268,20 @@ export const asyncRouterMap = [
         component: () => import('@/views/goods/goods/index'),
         name: '商品列表',
         meta: { title: '商品列表', icon: 'sw-goods', perms: 'goods:goods:list', noCache: true }
-      }
+      },
+      {
+        path: 'addGoods',
+        component: () => import('@/views/goods/goods/addGoods'),
+        name: '添加商品',
+        meta: { title: '添加商品', icon: 'sw-add', perms: 'goods:goods:addGoods', noCache: true }
+      },
+      {
+        path: 'updateGoods',
+        name: 'updateGoods',
+        component: () => import('@/views/goods/goods/updateGoods'),
+        meta: { title: '修改商品', icon: 'sw-wdit' },
+        hidden: true
+      },
     ]
   }
 ]

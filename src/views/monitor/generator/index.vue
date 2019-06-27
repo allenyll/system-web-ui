@@ -25,11 +25,11 @@
           <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="300"> 
+      <el-table-column align="center" label="操作" width="300">
         <template scope="scope">
           <el-button v-if="generatorManager_btn_generator" size="small" type="success" icon="el-icon-edit" @click="generator(scope.row)">生成代码
           </el-button>
-        </template> 
+        </template>
       </el-table-column>
     </el-table>
     <div v-show="!listLoading" class="pagination-container">
@@ -128,6 +128,10 @@ export default {
         {
           'name': 'pay',
           'value': 'pay'
+        },
+        {
+          'name': 'order',
+          'value': 'order'
         }
       ],
       tablePrefixOptions: [

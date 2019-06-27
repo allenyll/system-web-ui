@@ -5,7 +5,7 @@
       <el-button class="filter-item" type="primary" icon="search" @click="handleFilter">搜索</el-button>
       <el-button v-if="categoryManager_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="edit" @click="handleCreate">添加</el-button>
     </div>
-    <tree-table :data="treeData" :columns="columns" border>
+    <!--<tree-table :data="treeData" :columns="columns" border>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <el-button v-if="categoryManager_btn_edit" size="small" icon="el-icon-edit" type="success" @click="handleUpdate(scope.row)">编辑
@@ -14,7 +14,26 @@
           </el-button>
         </template>
       </el-table-column>
-    </tree-table>
+    </tree-table>-->
+    <el-table :data="treeData" style="width: 100%;margin-bottom: 20px;" border row-key="id">
+      <el-table-column v-if="show" prop="id" label="id" sortable/>
+      <el-table-column prop="name" align="center" label="分类名称" sortable/>
+      <el-table-column align="center" label="图片">
+        <template scope="scope">
+          <img :src="scope.row.url" min-width="50" height="50" >
+        </template>
+      </el-table-column>
+      <el-table-column prop="code" align="center" sortable label="编码"/>
+      <el-table-column align="center" prop="isUsed" label="是否启用"/>
+      <el-table-column label="操作" width="200">
+        <template slot-scope="scope">
+          <el-button v-if="categoryManager_btn_edit" size="small" icon="el-icon-edit" type="success" @click="handleUpdate(scope.row)">编辑
+          </el-button>
+          <el-button v-if="categoryManager_btn_del" size="small" icon="el-icon-delete" type="danger" @click="handleDelete(scope.row)">删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" @close="closeDialog()">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="分类名称" prop="categoryName">
@@ -48,23 +67,12 @@
           <el-input v-model="form.description" type="textarea" placeholder="请输入描述"/>
         </el-form-item>
         <el-form-item label="图片">
-          <el-upload
-            ref="upload"
-            :http-request="myUpload"
-            :limit="1"
-            :file-list="fileList"
-            :on-exceed="onExceed"
-            :before-upload="beforeUpload"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            action="/upload.do"
-            name="picture"
-            list-type="picture-card">
-            <i class="el-icon-plus"/>
-          </el-upload>
-          <el-dialog :visible.sync="dialogVisible">
-            <img :src="dialogImageUrl" width="100%" alt="">
-          </el-dialog>
+          <multi-upload
+            v-model="fileList"
+            :max-count="maxCount"
+            :upload-id="form.pkCategoryId"
+            upload-type="SW1802"
+            style="display: inline-block;margin-left: 10px"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -90,40 +98,55 @@
 </template>
 
 <script>
-import treeTable from '@/components/TreeTable'
+import multiUpload from '@/components/Upload/multiUpload'
 import { tree, addObj, getObj, delObj, putObj, list, categoryTree } from '@/api/goods/category/index'
 import { mapGetters } from 'vuex'
-import { getToken } from '@/utils/auth'
-import axios from 'axios'
 export default {
   name: 'Category',
-  components: { treeTable },
+  components: { multiUpload },
+  filters: {
+    isUsedFilter: function(val) {
+      const map = {
+        'SW1301': '停用',
+        'SW1302': '启用'
+      }
+      return map[val]
+    },
+    isUsedTypeFilter(val) {
+      const map = {
+        'SW1302': 'success',
+        'SW1301': 'info'
+      }
+      return map[val]
+    }
+  },
   data() {
     return {
-      columns: [
-        {
-          text: '分类名称',
-          value: 'name'
-        },
-        {
-          text: '图片',
-          value: 'url',
-          ifImage: 0
-        },
-        {
-          text: '分类编码',
-          value: 'code'
-        },
-        {
-          text: '层级',
-          value: 'level'
-        },
-        {
-          text: '是否启用',
-          value: 'isUsed'
-        }
-      ],
+      // columns: [
+      //   {
+      //     text: '分类名称',
+      //     value: 'name'
+      //   },
+      //   {
+      //     text: '图片',
+      //     value: 'url',
+      //     ifImage: 0
+      //   },
+      //   {
+      //     text: '分类编码',
+      //     value: 'code'
+      //   },
+      //   {
+      //     text: '层级',
+      //     value: 'level'
+      //   },
+      //   {
+      //     text: '是否启用',
+      //     value: 'isUsed'
+      //   }
+      // ],
       form: {
+        pkCategoryId: undefined,
         categoryNo: undefined,
         categoryName: undefined,
         parentId: undefined,
@@ -216,10 +239,10 @@ export default {
       },
       filterCategoryText: '',
       categoryTreeData: [],
-      dialogImageUrl: '',
-      dialogVisible: false,
       // 图片列表（用于在上传组件中回显图片）
-      fileList: []
+      fileList: [],
+      fileUrl: '',
+      maxCount: 1
     }
   },
   computed: {
@@ -244,6 +267,7 @@ export default {
         .then(response => {
           this.treeData = response.data.list
           this.listLoading = false
+          console.log(this.treeData)
         })
     },
     getParentList() {
@@ -310,7 +334,8 @@ export default {
     handleUpdate(row) {
       getObj(row.id)
         .then(response => {
-          var fileUrl = response.data.file.fileUrl
+          const fileUrl = response.data.file.fileUrl
+          this.fileUrl = fileUrl
           console.log(fileUrl)
           if (fileUrl !== undefined && fileUrl !== '') {
             var data = {
@@ -420,90 +445,6 @@ export default {
     },
     closeDialog() {
       this.fileList = []
-    },
-    // 自定义上传
-    myUpload(content) {
-      const token = getToken()
-      const self = this
-      const config = {
-        header: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': token + ',JWT_PLATFORM'
-        },
-        onUploadProgress: progressEvent => {
-          const percent = (progressEvent.loaded / progressEvent.total * 100) | 0
-          // 调用onProgress方法来显示进度条，需要传递个对象 percent为进度值
-          content.onProgress({ percent: percent })
-        }
-      }
-      const formData = new FormData()
-      formData.append('file', content.file)
-      formData.append('type', 'SW1803')
-      formData.append('id', '')
-
-      axios.post('http://www.allenyll.com:8080/system-web/file/upload', formData, config).then((res) => {
-        // 做处理
-        // this.getFileList(this.goodsId)
-        if (res.data.code === '100000') {
-          var data = {
-            name: '分类',
-            url: res.data.url
-          }
-          this.fileList.push(data)
-          self.uploadMessage = '上传成功！'
-        }
-      }).catch((error) => {
-
-      })
-    },
-    // 文件上传成功的钩子函数
-    handleSuccess(res, file) {
-      this.$message({
-        type: 'info',
-        message: '图片上传成功',
-        duration: 6000
-      })
-      if (file.response.success) {
-        this.editor.picture = file.response.message // 将返回的文件储存路径赋值picture字段
-      }
-    },
-    // 删除文件之前的钩子函数
-    handleRemove(file, fileList) {
-      this.$message({
-        type: 'info',
-        message: '已删除原有图片',
-        duration: 6000
-      })
-    },
-    // 点击列表中已上传的文件事的钩子函数
-    handlePreview(file) {
-      this.dialogImageUrl = file.url
-      this.dialogVisible = true
-    },
-    // 上传的文件个数超出设定时触发的函数
-    onExceed(files, fileList) {
-      this.$message({
-        type: 'info',
-        message: '最多只能上传一个图片',
-        duration: 6000
-      })
-    },
-    // 文件上传前的前的钩子函数
-    // 参数是上传的文件，若返回false，或返回Primary且被reject，则停止上传
-    beforeUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
-      const isGIF = file.type === 'image/gif'
-      const isPNG = file.type === 'image/png'
-      const isBMP = file.type === 'image/bmp'
-      const isLt2M = file.size / 1024 / 1024 < 2
-
-      if (!isJPG && !isGIF && !isPNG && !isBMP) {
-        this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
-      }
-      if (!isLt2M) {
-        this.$message.error('上传图片大小不能超过 2MB!')
-      }
-      return (isJPG || isBMP || isGIF || isPNG) && isLt2M
     }
   }
 }

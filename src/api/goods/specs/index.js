@@ -9,6 +9,14 @@ export function getSpecsList() {
   })
 }
 
+export function getSpecsListCondition(condition) {
+  return request({
+    url: path + 'getSpecsListCondition',
+    method: 'post',
+    params: condition
+  })
+}
+
 export function page(query) {
   return request({
     url: path + 'page',
