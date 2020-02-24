@@ -36,7 +36,7 @@
       <el-pagination :current-page.sync="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <el-dialog title="代码生成配置" :visible.sync="dialogFormVisible">
+    <el-dialog :visible.sync="dialogFormVisible" title="代码生成配置">
       <el-form ref="form" :model="form" label-width="100px">
         <el-form-item label="表名称" prop="tableName">
           <el-input v-model="form.tableName" placeholder="请输入名称"/>
@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { page, getObj, generator} from '@/api/monitor/generator/index'
+import { page, generator } from '@/api/monitor/generator/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'Generator',
@@ -132,6 +132,14 @@ export default {
         {
           'name': 'order',
           'value': 'order'
+        },
+        {
+          'name': 'market',
+          'value': 'market'
+        },
+        {
+          'name': 'shop',
+          'value': 'shop'
         }
       ],
       tablePrefixOptions: [
@@ -143,7 +151,7 @@ export default {
           'name': 'snu',
           'value': 'snu_'
         }
-      ],
+      ]
     }
   },
   created() {

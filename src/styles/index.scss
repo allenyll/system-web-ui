@@ -183,6 +183,15 @@ code {
   }
 }
 
+.operate-container{
+  margin: 20px 0px;
+}
+
+.operate-container .btn-add {
+  float: right;
+}
+
+
 //refine vue-multiselect plugin
 .multiselect {
   line-height: 16px;
@@ -190,4 +199,24 @@ code {
 
 .multiselect--active {
   z-index: 1000 !important;
+}
+
+.color-main {
+  color: #409EFF;
+}
+
+.color-success {
+  color: #67C23A;
+}
+
+.color-warning {
+  color: #E6A23C;
+}
+
+.color-danger {
+  color: #F56C6C;
+}
+
+.color-info {
+  color: #909399;
 }

@@ -1,6 +1,6 @@
 <template>
   <div style="margin-top: 50px">
-    <el-form ref="goodsInfoForm" :model="value" label-width="100px">
+    <el-form ref="goodsInfoForm" :model="value" :rules="rules" label-width="100px">
       <el-row>
         <el-col :span="12">
           <el-form-item label="商品名称" prop="goodsName">
@@ -159,20 +159,6 @@
       </el-row>
       <el-row>
         <el-col :span="12">
-          <el-form-item label="是否新品" prop="isNew">
-            <el-radio v-model="value.isNew" label="SW1001">是</el-radio>
-            <el-radio v-model="value.isNew" label="SW1002">否</el-radio>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="是否推荐" prop="isRecom">
-            <el-radio v-model="value.isRecom" label="SW1001">是</el-radio>
-            <el-radio v-model="value.isRecom" label="SW1002">否</el-radio>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="12">
           <el-form-item label="是否启用" prop="isUsed">
             <el-radio v-model="value.isUsed" label="SW1301">停用</el-radio>
             <el-radio v-model="value.isUsed" label="SW1302">启用</el-radio>
@@ -186,30 +172,9 @@
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">
-          <el-form-item label="是否精品" prop="isBest">
-            <el-radio v-model="value.isBest" label="SW1001">是</el-radio>
-            <el-radio v-model="value.isBest" label="SW1002">否</el-radio>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="是否热卖" prop="isHot">
-            <el-radio v-model="value.isHot" label="SW1001">是</el-radio>
-            <el-radio v-model="value.isHot" label="SW1002">否</el-radio>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row>
         <el-col :span="24">
           <el-form-item label="简介" prop="goodsBrief">
             <el-input v-model="value.goodsBrief" type="textarea" placeholder="请输入简介"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="24">
-          <el-form-item label="备注" prop="remark">
-            <el-input v-model="value.remark" type="textarea" placeholder="请输入备注"/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -239,84 +204,84 @@ export default {
       categoryProps: {
         value: 'id'
       },
-      // rules: {
-      //   fkBrandId: [
-      //     {
-      //       required: true,
-      //       message: '请输入品牌主键',
-      //       trigger: 'blur'
-      //     }
-      //   ], fkCategoryId: [
-      //     {
-      //       required: true,
-      //       message: '请输入分类主键',
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   goodsName: [
-      //     {
-      //       required: true,
-      //       message: '请输入商品名称',
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   goodsCode: [
-      //     {
-      //       required: true,
-      //       message: '请输入商品编码',
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   price: [
-      //     {
-      //       required: true,
-      //       message: '请输入商品价格',
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   stock: [
-      //     {
-      //       required: true,
-      //       message: '请输入库存量',
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   season: [
-      //     {
-      //       required: true,
-      //       message: '请输入季节性',
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   unit: [
-      //     {
-      //       required: true,
-      //       message: '请输入单位',
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   isUsed: [
-      //     {
-      //       required: true,
-      //       message: '请输入是否启用',
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   status: [
-      //     {
-      //       required: true,
-      //       message: '请输入商品状态',
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   saleTime: [
-      //     {
-      //       required: true,
-      //       message: '请选择上架时间',
-      //       trigger: 'blur'
-      //     }
-      //   ]
-      // },
+      rules: {
+        fkBrandId: [
+          {
+            required: true,
+            message: '请输入品牌主键',
+            trigger: 'blur'
+          }
+        ], fkCategoryId: [
+          {
+            required: true,
+            message: '请输入分类主键',
+            trigger: 'blur'
+          }
+        ],
+        goodsName: [
+          {
+            required: true,
+            message: '请输入商品名称',
+            trigger: 'blur'
+          }
+        ],
+        goodsCode: [
+          {
+            required: true,
+            message: '请输入商品编码',
+            trigger: 'blur'
+          }
+        ],
+        price: [
+          {
+            required: true,
+            message: '请输入商品价格',
+            trigger: 'blur'
+          }
+        ],
+        stock: [
+          {
+            required: true,
+            message: '请输入库存量',
+            trigger: 'blur'
+          }
+        ],
+        season: [
+          {
+            required: true,
+            message: '请输入季节性',
+            trigger: 'blur'
+          }
+        ],
+        unit: [
+          {
+            required: true,
+            message: '请输入单位',
+            trigger: 'blur'
+          }
+        ],
+        isUsed: [
+          {
+            required: true,
+            message: '请输入是否启用',
+            trigger: 'blur'
+          }
+        ],
+        status: [
+          {
+            required: true,
+            message: '请输入商品状态',
+            trigger: 'blur'
+          }
+        ],
+        saleTime: [
+          {
+            required: true,
+            message: '请选择上架时间',
+            trigger: 'blur'
+          }
+        ]
+      },
       brandOptions: [],
       categoryOptions: [],
       selectCategory: [],

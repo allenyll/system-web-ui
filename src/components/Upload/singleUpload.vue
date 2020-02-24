@@ -121,11 +121,7 @@ export default {
     },
     // 删除文件之前的钩子函数
     handleRemove(file, fileList) {
-      this.$message({
-        type: 'info',
-        message: '已删除原有图片',
-        duration: 6000
-      })
+      this.emitInput('')
     },
     // 点击列表中已上传的文件事的钩子函数
     handlePreview(file) {
@@ -148,13 +144,13 @@ export default {
       const isGIF = file.type === 'image/gif'
       const isPNG = file.type === 'image/png'
       const isBMP = file.type === 'image/bmp'
-      const isLt2M = file.size / 1024 / 1024 < 2
+      const isLt2M = file.size / 1024 / 1024 < 10
 
       if (!isJPG && !isGIF && !isPNG && !isBMP) {
         this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
       }
       if (!isLt2M) {
-        this.$message.error('上传图片大小不能超过 2MB!')
+        this.$message.error('上传图片大小不能超过 10MB!')
       }
       return (isJPG || isBMP || isGIF || isPNG) && isLt2M
     }

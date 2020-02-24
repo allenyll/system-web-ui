@@ -103,11 +103,11 @@
           style="margin-top: 20px"
           @click="syncSkuPrice">同步价格
         </el-button>
-        <el-button
-          type="primary"
-          style="margin-top: 20px"
-          @click="clearSkuList">清空SKU列表
-        </el-button>
+        <!--        <el-button-->
+        <!--          type="primary"-->
+        <!--          style="margin-top: 20px"-->
+        <!--          @click="clearSkuList">清空SKU列表-->
+        <!--        </el-button>-->
       </el-form-item>
       <el-form-item v-if="hasAttrPic" label="属性图片：">
         <el-card shadow="never" class="cardBg">
@@ -288,7 +288,7 @@ export default {
       this.value.skuStockList = skuStockMapList
     },
     changeCategory(selectId) {
-      // 获取分类下的商品规格
+      // 获取分类下的
       this.specsList = []
       if (!this.isEdit) {
         this.value.skuStockList = []
@@ -428,6 +428,8 @@ export default {
         }
       }
       console.log(skuList)
+      this.value.skuStockList = skuList
+      this.value.skuStockMapList = skuList
     },
     resetSkuSpecPic(specsList) {
       this.selectSkuSpecAttrPics = []
@@ -484,9 +486,11 @@ export default {
         console.log(this.value.skuStockList)
         if (this.value.skuStockList !== null && this.value.skuStockList.length > 0) {
           const price = this.value.skuStockList[0].skuPrice
-          for (let i = 0; i < this.value.skuStockList.length; i++) {
+          console.log(price)
+          for (let i = 1; i < this.value.skuStockList.length; i++) {
             this.value.skuStockList[i].skuPrice = price
           }
+          console.log(this.value.skuStockList)
         }
       })
     },

@@ -281,7 +281,77 @@ export const asyncRouterMap = [
         component: () => import('@/views/goods/goods/updateGoods'),
         meta: { title: '修改商品', icon: 'sw-wdit' },
         hidden: true
+      }
+    ]
+  },
+  {
+    path: '/order',
+    component: Layout,
+    name: '订单管理',
+    meta: { title: '订单管理', icon: 'sw-order', perms: 'order:order' },
+    icon: 'setting',
+    children: [
+      {
+        path: 'coupon'
+        ,
+        component: () => import('@/views/order/order/index'),
+        name: '订单列表',
+        meta: { title: '订单列表', icon: 'sw-order', noCache: true, perms: 'order:order:list' }
       },
+      {
+        path: 'deliverOrderList',
+        name: 'deliverOrderList',
+        component: () => import('@/views/order/order/deliverOrderList'),
+        meta: { title: '发货列表' },
+        hidden: true
+      },
+      {
+        path: 'orderDetail',
+        name: 'orderDetail',
+        component: () => import('@/views/order/order/orderDetail'),
+        meta: { title: '订单详情' },
+        hidden: true
+      }
+    ]
+  },
+  {
+    path: '/market',
+    component: Layout,
+    name: '营销管理',
+    meta: { title: '营销管理', icon: 'sw-market', perms: 'market:market' },
+    icon: 'setting',
+    children: [
+      {
+        path: 'coupon',
+        component: () => import('@/views/market/coupon/index'),
+        name: '优惠券管理',
+        meta: { title: '优惠券管理', icon: 'sw-coupon', noCache: true, perms: 'market:coupon:list' }
+      },
+      {
+        path: 'couponDetail',
+        name: 'couponDetail',
+        component: () => import('@/views/market/coupon/detail'),
+        meta: { title: '优惠券领取详情' },
+        hidden: true
+      },
+      {
+        path: 'adPosition',
+        component: () => import('@/views/market/adPosition/index'),
+        name: '广告位管理',
+        meta: { title: '广告位管理', icon: 'sw-ad', noCache: true, perms: 'market:adPosition:list' }
+      },
+      {
+        path: 'ad',
+        component: () => import('@/views/market/ad/index'),
+        name: '广告管理',
+        meta: { title: '广告管理', icon: 'sw-ad', noCache: true, perms: 'market:ad:list' }
+      },
+      {
+        path: 'message',
+        component: () => import('@/views/market/message/index'),
+        name: '消息管理',
+        meta: { title: '消息管理', icon: 'sw-message', noCache: true, perms: 'market:message:list' }
+      }
     ]
   }
 ]

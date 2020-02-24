@@ -215,6 +215,7 @@ export default {
     getMenuTreeList() {
       getMenuTree('menu').then(data => {
         this.menuTreeData = data.data.menuTree
+        console.log(this.menuTreeData)
       })
     },
     cancleMenu() {

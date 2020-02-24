@@ -1,12 +1,11 @@
 import request from '@/utils/request'
 
-const path = '/system-web/goods/'
+const path = '/system-web/coupon/'
 
-export function getGoodsList(param) {
+export function list() {
   return request({
-    url: path + 'getGoodsList',
-    method: 'post',
-    data: param
+    url: path + 'list',
+    method: 'post'
   })
 }
 
@@ -38,7 +37,7 @@ export function delObj(id, obj) {
     url: path + id,
     method: 'delete',
     params: {
-      eq_pk_goods_id: id
+      eq_pk_coupon_id: id
     }
   })
 }
@@ -51,26 +50,13 @@ export function putObj(id, obj) {
   })
 }
 
-export function updateLabel(params) {
+export function publishCoupon(tempCouponId, customerId) {
   return request({
-    url: path + 'updateLabel',
+    url: path + 'publishCoupon',
     method: 'post',
-    data: params
-  })
-}
-
-export function createGoods(param) {
-  return request({
-    url: path + 'createGoods',
-    method: 'post',
-    data: param
-  })
-}
-
-export function updateGoods(id, param) {
-  return request({
-    url: path + 'updateGoods/' + id,
-    method: 'post',
-    data: param
+    data: {
+      couponId: tempCouponId,
+      customerId: customerId
+    }
   })
 }

@@ -31,7 +31,7 @@
         <el-option key="SW1403" label="预售" value="SW1403"/>
       </el-select>
       <el-button class="filter-item" type="primary" icon="search" @click="handleFilter">搜索</el-button>
-      <el-button v-if="goodsManager_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="edit" @click="handleCreate">添加</el-button>
+<!--      <el-button v-if="goodsManager_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="edit" @click="handleCreate">添加</el-button>-->
     </div>
     <el-table v-loading.body="listLoading" :key="tableKey" :data="list" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionChange">
       <el-table-column

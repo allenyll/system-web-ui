@@ -1,8 +1,8 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.like_customerName" style="width: 200px;" class="filter-item" placeholder="姓名" @keyup.enter.native="handleFilter"/>
-      <el-input v-model="listQuery.like_customerAccount" style="width: 200px;" class="filter-item" placeholder="账户" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.like_customer_name" style="width: 200px;" class="filter-item" placeholder="姓名" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.like_customer_account" style="width: 200px;" class="filter-item" placeholder="账户" @keyup.enter.native="handleFilter"/>
       <el-input v-model="listQuery.like_phone" style="width: 200px;" class="filter-item" placeholder="手机号" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button v-if="customerManager_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
@@ -178,8 +178,8 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        like_customerName: '',
-        like_customerAccount: '',
+        like_customer_name: '',
+        like_customer_account: '',
         like_phone: ''
       },
       sexOptions: [

@@ -344,13 +344,12 @@ export default {
       set[formName].validate(valid => {
         if (valid) {
           this.dialogFormVisible = false
-          this.form.password = undefined
           putObj(this.form.pkJobId, this.form).then(() => {
             this.dialogFormVisible = false
             this.getList()
             this.$notify({
               title: '成功',
-              message: '创建成功',
+              message: '更新成功',
               type: 'success',
               duration: 2000
             })

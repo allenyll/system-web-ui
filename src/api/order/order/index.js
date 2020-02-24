@@ -3,10 +3,10 @@ import request from '@/utils/request'
 const path = '/system-web/order/'
 
 export function list() {
-    return request({
-        url: path + 'list',
-        method: 'post'
-    })
+  return request({
+    url: path + 'list',
+    method: 'post'
+  })
 }
 
 export function page(query) {
@@ -31,14 +31,58 @@ export function getObj(id) {
     method: 'get'
   })
 }
-
-export function delObj(id, obj) {
+export function deleteOrder(params) {
   return request({
-    url: path + id,
-    method: 'delete',
-    params: {
-      eq_pk_order_id: id
-    }
+    url: path + 'deleteOrder',
+    method: 'post',
+    params: params
+  })
+}
+
+export function closeOrder(params) {
+  return request({
+    url: path + 'closeOrder',
+    method: 'post',
+    params: params
+  })
+}
+
+export function deliveryOrder(params) {
+  return request({
+    url: path + 'deliveryOrder',
+    method: 'post',
+    params: params
+  })
+}
+
+export function getOrderDetail(id) {
+  return request({
+    url: '/system-web/orderDetail/getOrderDetail/' + id,
+    method: 'post'
+  })
+}
+
+export function updateReceiverInfo(params) {
+  return request({
+    url: path + 'updateReceiverInfo',
+    method: 'post',
+    params: params
+  })
+}
+
+export function updateMoneyInfo(params) {
+  return request({
+    url: path + 'updateMoneyInfo',
+    method: 'post',
+    params: params
+  })
+}
+
+export function updateOrderNote(params) {
+  return request({
+    url: path + 'updateOrderNote',
+    method: 'post',
+    params: params
   })
 }
 
